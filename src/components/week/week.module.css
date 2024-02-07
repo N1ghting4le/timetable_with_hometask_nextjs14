@@ -1,0 +1,50 @@
+.week {
+    position: absolute;
+    display: grid;
+    grid-template-rows: repeat(3, min-content);
+    grid-template-columns: 1fr 1fr;
+    column-gap: 7vw;
+    row-gap: 20px;
+    width: 100vw;
+    grid-auto-flow: column;
+    padding: 10vh 7vw;
+    height: min-content;
+    transition: transform 0.3s ease-in-out;
+}
+
+@keyframes movementFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes movementFromRight {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.fromLeft {
+    animation: movementFromLeft 0.3s ease-in-out;
+}
+
+.fromRight {
+    animation: movementFromRight 0.3s ease-in-out;
+}
+
+@media (max-width: 431px) {
+    .week {
+        position: unset;
+        display: flex;
+        flex-direction: column;
+        padding: 5vh 0;
+    }
+}

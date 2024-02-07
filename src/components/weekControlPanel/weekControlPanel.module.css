@@ -1,0 +1,78 @@
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 80%;
+    align-self: center;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.buttonStyle {
+    background-color: #393E46;
+    color: #00ADB5;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.prev {
+    clip-path: polygon(8% 0%, 100% 0%, 94% 50%, 100% 100%, 8% 100%, 0% 50%);
+    shape-outside: polygon(8% 0%, 100% 0%, 94% 50%, 100% 100%, 8% 100%, 0% 50%);
+}
+
+.next {
+    clip-path: polygon(0% 0%, 92% 0%, 100% 50%, 92% 100%, 0% 100%, 6% 50%);
+    shape-outside: polygon(0% 0%, 92% 0%, 100% 50%, 92% 100%, 0% 100%, 6% 50%);
+}
+
+.subgrButt {
+    border-radius: 5px;
+    border: 0;
+}
+
+.buttonStyle:hover {
+    background-color: #303030;
+    transition: all 0.2s ease-in-out;
+}
+
+@media (max-width: 431px) {
+    .buttons {
+        justify-content: center;
+        order: 1;
+        width: 100%;
+    }
+
+    .buttonStyle {
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .wrapper {
+        flex-wrap: wrap;
+        width: 100%;
+        padding-inline: 5vw;
+    }
+
+    .subgrButt {
+        width: 100%;
+        padding: 8px 0;
+    }
+
+    .arrow {
+        padding-inline: 20px;
+    }
+}

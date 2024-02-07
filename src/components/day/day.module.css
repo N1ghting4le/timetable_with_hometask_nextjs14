@@ -1,0 +1,41 @@
+.day {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #393E46;
+    color: #fff;
+    box-shadow: 5px 5px 10px gray;
+    padding: 1rem;
+    height: 100%;
+}
+
+.first {
+    border-radius: 30px 0 30px 0;
+}
+
+.second {
+    border-radius: 0 30px 0 30px;
+}
+
+.text {
+    font-size: 1.5rem;
+    font-weight: bolder;
+}
+
+@media (max-width: 431px) {
+    .day {
+        padding-inline: 0.5rem;
+    }
+
+    .text {
+        font-size: 1.2rem;
+    }
+
+    .first {
+        border-radius: 20px 0 20px 0;
+    }
+
+    .second {
+        border-radius: 0 20px 0 20px;
+    }
+}

@@ -1,0 +1,11 @@
+.weekWrapper {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 2rem;
+}
+  
+.weeks {
+    display: flex;
+}
