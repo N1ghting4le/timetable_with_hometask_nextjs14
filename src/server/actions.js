@@ -21,7 +21,7 @@ export default async function getTimetable() {
 
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
-            schedules = response.schedules || response.currentSchedules.schedules,
+            schedules = response.schedules || (response.currentSchedules && response.currentSchedules.schedules) || response.previousSchedules,
             date = new Date(),
             currDate = date.getDate(),
             currMonth = date.getMonth(),
