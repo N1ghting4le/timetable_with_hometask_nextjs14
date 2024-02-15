@@ -21,14 +21,14 @@ export default async function getTimetable() {
 
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
-            schedules = response.schedules || (response.currentSchedules && response.currentSchedules.schedules) || response.previousSchedules,
+            schedules = response.schedules || response.currentSchedules?.schedules || response.previousSchedules,
             date = new Date(),
             currDate = date.getDate(),
             currMonth = date.getMonth(),
             currYear = date.getFullYear(),
             dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`;
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
-    
+    console.log(schedules);
     const timetable = days.map(item => {
         const day = schedules[item];
 
