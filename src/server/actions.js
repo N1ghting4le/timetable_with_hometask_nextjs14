@@ -28,7 +28,7 @@ const parseTimetable = (response, listOfWeeks) => {
             currYear = date.getFullYear(),
             dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`;
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
-    console.log(schedules);
+    
     const timetable = days.map(item => {
         const day = schedules[item];
 
