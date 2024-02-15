@@ -11,7 +11,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className} style={{overflowY: 'hidden'}}>{children}</body>
+      <body className={inter.className} 
+            style={{overflowY: 'hidden', fontFamily: '__Inter_e66fe9, __Inter_Fallback_e66fe9'}}>{children}</body>
     </html>
   )
 }
