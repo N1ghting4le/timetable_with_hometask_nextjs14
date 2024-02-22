@@ -13,6 +13,7 @@ export const SubgroupContext = createContext(0);
 const WeekList = () => {
     const [subgroup, setSubgroup] = useState(0);
     const [curr, setCurr] = useState(-2);
+    const [prevCurr, setPrevCurr] = useState(-2);
     const [weekList, setWeekList] = useState([]);
     const [isDesktop, setIsDesktop] = useState(false);
 
@@ -25,11 +26,18 @@ const WeekList = () => {
             const { weekList, currWeekIndex } = await getTimetable();
 
             setCurr(currWeekIndex);
+            setPrevCurr(currWeekIndex);
             setWeekList(weekList);
         })();
     }, []);
 
-    const renderWeeks = () => weekList.length ? weekList.map((week, i) => <Week key={i} weekIndex={i} weekNum={week.weekNum} days={week.days} curr={curr} isDesktop={isDesktop}/>) : <Loading/>;
+    const renderWeeks = () => weekList.length ? weekList.map((week, i) => <Week key={i} 
+                                                                                weekIndex={i} 
+                                                                                weekNum={week.weekNum} 
+                                                                                days={week.days} 
+                                                                                curr={curr} 
+                                                                                prevCurr={prevCurr} 
+                                                                                isDesktop={isDesktop}/>) : <Loading/>;
 
     const elements = renderWeeks();
     
@@ -39,7 +47,8 @@ const WeekList = () => {
                               subgroup={subgroup} 
                               setSubgroup={setSubgroup}
                               curr={curr}
-                              setCurr={setCurr}/>
+                              setCurr={setCurr}
+                              setPrevCurr={setPrevCurr}/>
             <div className={styles.weeks}>
                 <SubgroupContext.Provider value={subgroup}>
                     {elements}

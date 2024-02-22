@@ -1,36 +1,33 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Day from "../day/Day";
 import styles from "./week.module.css";
 
-const Week = ({ weekIndex, weekNum, days, curr, isDesktop }) => {
-    const [prevCurr, setPrevCurr] = useState(curr);
-    const [isCurr, setIsCurr] = useState(curr === weekIndex);
-    const [side, setSide] = useState('');
+const Week = ({ weekIndex, weekNum, days, curr, prevCurr, isDesktop }) => {
+    const [display, setDisplay] = useState(curr === weekIndex);
     const [hometasks, setHometasks] = useState(days.map(item => item.subjects.map((item => item.hometask))));
     const ref = useRef({});
 
+    const side = useMemo(() => {
+        if (prevCurr > weekIndex) return styles.fromLeft;
+        return prevCurr < weekIndex ? styles.fromRight : null;
+    }, [prevCurr]);
+
     useEffect(() => {
         if (curr === weekIndex) {
-            setSide(() => {
-                if (prevCurr > weekIndex) return styles.fromLeft;
-                return prevCurr < weekIndex ? styles.fromRight : null;
-            });
-            setIsCurr(true);
-        } else if (prevCurr === weekIndex) {
+            setDisplay(true);
+        } else if (display) {
             if (isDesktop) {
                 setTimeout(() => {
-                    setIsCurr(false);
+                    setDisplay(false);
                 }, 300);
     
                 ref.current.style.transform = curr > weekIndex ? "translateX(-100%)" : "translateX(100%)";
             } else {
-                setIsCurr(false);
+                setDisplay(false);
             }
         }
-
-        setPrevCurr(curr);
     }, [curr]);
 
     const renderDays = () => days.map((item, i) => {
@@ -41,7 +38,7 @@ const Week = ({ weekIndex, weekNum, days, curr, isDesktop }) => {
 
     const elements = renderDays();
 
-    return isCurr ? (
+    return display ? (
         <div className={`${styles.week} ${side}`} ref={el => ref.current = el}>
             {elements}
         </div>
