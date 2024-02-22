@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import Day from "../day/Day";
 import styles from "./week.module.css";
 
 const Week = ({ weekIndex, weekNum, days, curr, prevCurr, isDesktop }) => {
     const [display, setDisplay] = useState(curr === weekIndex);
+    const [side, setSide] = useState(null);
     const [hometasks, setHometasks] = useState(days.map(item => item.subjects.map((item => item.hometask))));
     const ref = useRef({});
-
-    const side = useMemo(() => {
-        if (prevCurr > weekIndex) return styles.fromLeft;
-        return prevCurr < weekIndex ? styles.fromRight : null;
-    }, [prevCurr]);
 
     useEffect(() => {
         if (curr === weekIndex) {
             setDisplay(true);
+            setSide(() => {
+                if (prevCurr > weekIndex) return styles.fromLeft;
+                return prevCurr < weekIndex ? styles.fromRight : null;
+            });
         } else if (display) {
             if (isDesktop) {
                 setTimeout(() => {
