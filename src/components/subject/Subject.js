@@ -131,7 +131,10 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
                         <p className={styles.smaller}>{end}</p>
                     </div>
                     <div className={styles.line} style={{backgroundColor: color}}/>
-                    <p>{subjShort} ({type})<br/>{note}</p>
+                    <div className={styles.textWrapper}>
+                        <p>{subjShort} ({type})</p>
+                        { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
+                    </div>
                 </div>
                 <p className={styles.htText}>{hometaskText}</p>
                 {
