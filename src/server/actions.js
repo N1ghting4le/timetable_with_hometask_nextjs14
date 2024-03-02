@@ -13,20 +13,22 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
 }
 
 export default async function getTimetable() {
-    const response = await request(API_URL);
-    const weekList = await request(`${SERVER_URL}/weekList`, "GET", null, HEADERS);
-
-    return parseTimetable(response, weekList);
+    return new Promise(async (resolve, reject) => {
+        const response = await request(API_URL);
+        const weekList = await request(`${SERVER_URL}/weekList`, "GET", null, HEADERS);
+        
+        response && weekList ? resolve(parseTimetable(response, weekList)) : reject();
+    });
 }
 
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
-            schedules = response.schedules || response.currentSchedules?.schedules || response.previousSchedules,
-            date = new Date(),
-            currDate = date.getDate(),
-            currMonth = date.getMonth(),
-            currYear = date.getFullYear(),
-            dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`;
+          schedules = response.schedules || response.currentSchedules?.schedules || response.previousSchedules,
+          date = new Date(),
+          currDate = date.getDate(),
+          currMonth = date.getMonth(),
+          currYear = date.getFullYear(),
+          dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`;
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
     
     const timetable = days.map(item => {

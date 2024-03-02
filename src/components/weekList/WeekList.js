@@ -3,7 +3,7 @@
 import WeekControlPanel from "../weekControlPanel/WeekControlPanel";
 import Week from "../week/Week";
 import Loading from "../loading/Loading";
-import { useState, useEffect, createContext } from "react";
+import { useState, useLayoutEffect, createContext } from "react";
 import styles from "./weekList.module.css";
 import getTimetable from '@/server/actions';
 import MobileDetect from "mobile-detect";
@@ -17,18 +17,22 @@ const WeekList = () => {
     const [weekList, setWeekList] = useState([]);
     const [isDesktop, setIsDesktop] = useState(false);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        getTimetable()
+        .then(res => {
+            const { weekList, currWeekIndex } = res;
+
+            setWeekList(weekList);
+            setCurr(currWeekIndex);
+            setPrevCurr(currWeekIndex);
+        })
+        .catch(() => {
+            throw new Error("Could not fetch nessessary data");
+        });
+
         const md = new MobileDetect(navigator.userAgent);
 
         setIsDesktop(!md.mobile());
-
-        (async () => {
-            const { weekList, currWeekIndex } = await getTimetable();
-
-            setCurr(currWeekIndex);
-            setPrevCurr(currWeekIndex);
-            setWeekList(weekList);
-        })();
     }, []);
 
     const renderWeeks = () => weekList.length ? weekList.map((week, i) => <Week key={i} 
