@@ -1,11 +1,11 @@
 import Btn from "./components/Btn/Btn";
 
-export const renderElements = (id, className, func, process, errorClName, cond = null) => {
+export const renderElements = (id, className, func, process, errorClName, cond = null, text = '') => {
     if (cond) return null;
 
     return (
         <>
-            <textarea id={id} type="text" className={className} onKeyDown={(e) => e.code === 'Enter' ? func() : null}/>
+            <textarea id={id} type="text" autoFocus={true} defaultValue={text} className={className} onKeyDown={(e) => e.code === 'Enter' ? func() : null}/>
             {
                 process === 'sending' ? <p>Отправка...</p> :
                 <>

@@ -6,6 +6,8 @@
     padding: 20px 30px;
     width: 400px;
     min-height: 310px;
+    max-height: 80vh;
+    overflow: auto;
     background-color: #fff;
 }
 
@@ -13,7 +15,22 @@
     background: rgba(0, 0, 0, 0.5);
 }
 
-@media (max-width: 431px) {
+@media (min-width: 992px) {
+    .popup-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .popup-content::-webkit-scrollbar-thumb {
+        background-color: rgb(180, 179, 179);
+        border-radius: 2px;
+    }
+    
+    .popup-content::-webkit-scrollbar-track {
+        background: #fff;
+    }
+}
+
+@media (max-width: 576px) {
     .popup-content {
         max-width: 90vw;
     }

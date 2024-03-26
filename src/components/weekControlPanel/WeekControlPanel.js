@@ -1,8 +1,13 @@
+'use client';
+
+import { useCurr, useSubgroup } from '../GlobalContext';
 import styles from './weekControlPanel.module.css';
 
-const WeekControlPanel = ({ limit, subgroup, setSubgroup, curr, setCurr, setPrevCurr }) => {
-    const moveToNext = () => { setPrevCurr(curr); setCurr(curr => curr + 1); }
-    const moveToPrev = () => { setPrevCurr(curr); setCurr(curr => curr - 1); }
+const WeekControlPanel = ({ limit }) => {
+    const { curr, setCurr } = useCurr();
+    const { subgroup, setSubgroup } = useSubgroup();
+    const moveToNext = () => setCurr(curr + 1);
+    const moveToPrev = () => setCurr(curr - 1);
     const changeSubgroup = (e) => setSubgroup(+e.target.dataset.subgr);
     const isActive = num => subgroup === num ? { backgroundColor: 'black' } : null;
     

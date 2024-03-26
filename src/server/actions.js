@@ -3,13 +3,17 @@
 import { API_URL, SERVER_URL, HEADERS } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
-    const res = await fetch(url, { method, headers, body, cache: 'no-store' });
+    try {
+        const res = await fetch(url, { method, headers, body, cache: 'no-store' });
+    
+        if (!res.ok) {
+            throw new Error(`Failed to fetch ${url}, status: ${res.status}`);
+        }
 
-    if (!res.ok) {
-        throw new Error(`Failed to fetch ${url}, status: ${res.status}`);
+        return res.json();        
+    } catch (error) {
+        console.error(`Error: ${error.code}`);
     }
-
-    return res.json();
 }
 
 export default async function getTimetable() {
@@ -28,25 +32,28 @@ const parseTimetable = (response, listOfWeeks) => {
           currDate = date.getDate(),
           currMonth = date.getMonth(),
           currYear = date.getFullYear(),
-          dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`;
+          dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`,
+          exclusions = ['Консультация', 'Экзамен'];
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
+
+    const getTime = (dateStr) => new Date(dateStr.split('.').reverse().join('-')).getTime();
     
     const timetable = days.map(item => {
         const day = schedules[item];
 
         return {
             name: item,
-            subjects: day.filter(subj => subj.lessonTypeAbbrev !== 'Консультация' && subj.lessonTypeAbbrev !== 'Экзамен').map(subj => ({
+            subjects: day.filter(subj => !exclusions.includes(subj.lessonTypeAbbrev)).map(subj => ({
                 auditories: subj.auditories.length ? subj.auditories : [""],
                 startLessonDate: subj.startLessonDate,
                 endLessonDate: subj.endLessonDate,
-                startLessonTime: subj.startLessonTime,
-                endLessonTime: subj.endLessonTime,
+                start: subj.startLessonTime,
+                end: subj.endLessonTime,
                 numSubgroup: subj.numSubgroup,
-                subject: subj.subject,
-                subjectFullName: subj.subjectFullName,
+                subjShort: subj.subject,
+                subject: subj.subjectFullName,
                 type: subj.lessonTypeAbbrev,
-                weekNumber: subj.weekNumber,
+                weeks: subj.weekNumber,
                 note: subj.note,
                 employees: subj.employees.length ? subj.employees.map(emp => ({
                     firstName: emp.firstName,
@@ -72,16 +79,17 @@ const parseTimetable = (response, listOfWeeks) => {
 
             if (day.day === 'Воскресенье') return null;
 
-            const dayDate = new Date(day.date.split('.').reverse().join('-')).getTime();
-            const weekNum = item.id % 4 || 4;
-            const [{subjects: fullDayTimetable}] = timetable.filter(unit => unit.name === day.day);
-            const subjects = fullDayTimetable.filter(subj => {
-                const subjStartDate = new Date(subj.startLessonDate.split('.').reverse().join('-')).getTime(),
-                        subjEndDate = new Date(subj.endLessonDate.split('.').reverse().join('-')).getTime();
+            const dayDate = getTime(day.date),
+                  weekNum = item.id % 4 || 4,
+                  [{subjects: fullDayTimetable}] = timetable.filter(unit => unit.name === day.day);
 
-                return subj.weekNumber && subj.weekNumber.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
+            const subjects = fullDayTimetable.filter(subj => {
+                const subjStartDate = getTime(subj.startLessonDate),
+                      subjEndDate = getTime(subj.endLessonDate);
+
+                return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
             }).map(subj => {
-                const task = day.hometasks.filter(task => task.subject === subj.subject && (task.subject === 'ИнЯз' ? JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]) : true) && task.type === subj.type);
+                const task = day.hometasks.filter(task => task.subject === subj.subjShort && (task.subject === 'ИнЯз' ? JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]) : true) && task.type === subj.type);
                 let hometask = "";
 
                 if (task.length) {
@@ -116,7 +124,9 @@ const parseTimetable = (response, listOfWeeks) => {
     return {
         weekList,
         currWeekIndex: currWeekIndex >= firstEmptyWeek && firstEmptyWeek >= 0 ? 
-        currWeekIndex <= lastEmptyWeek ? firstEmptyWeek > 0 ? firstEmptyWeek - 1 : 0 : currWeekIndex + firstEmptyWeek - lastEmptyWeek - 1 
+        currWeekIndex <= lastEmptyWeek ? 
+        firstEmptyWeek > 0 ? firstEmptyWeek - 1 : 0 
+        : currWeekIndex + firstEmptyWeek - lastEmptyWeek - 1 
         : currWeekIndex
     }
 }

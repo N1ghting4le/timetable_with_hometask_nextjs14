@@ -28,3 +28,18 @@ ul {
     color-scheme: dark;
   }
 }
+
+@media (min-width: 992px) {
+  body::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  body::-webkit-scrollbar-thumb {
+    background-color: rgb(180, 179, 179);
+    border-radius: 3px;
+  }
+  
+  body::-webkit-scrollbar-track {
+    background: #AAD8D3
+  }
+}

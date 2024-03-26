@@ -7,35 +7,27 @@ import { useState, useMemo, useEffect } from "react";
 import { PHOTO_URL, SERVER_URL, HEADERS } from "@/env/env";
 import { request } from "@/server/actions";
 import { renderElements } from "@/commonFunctions";
-import { SubgroupContext } from "../weekList/WeekList";
-import { useContext } from "react";
+import { useSubgroup, useSubject } from "../GlobalContext";
 import styles from "./subject.module.css";
 
-const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, note, weeks, teacher, weekIndex, dayIndex, hometask, setHometasks, dayI, ind }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, weekServerIndex, dayServerIndex }) => {
+    const { auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, hometask, setHometask } = useSubject(weekIndex, dayIndex, subjectIndex);
+    const { subgroup } = useSubgroup();
+    const teacher = employees[0];
+    const { firstName, middleName, lastName, photoLink } = teacher;
     const [open, setOpen] = useState(false);
     const [process, setProcess] = useState('idle');
-    const [hometaskText, setHometaskText] = useState(hometask);
-    const { firstName, middleName, lastName, photoLink } = teacher;
-    const subgroupNum = useContext(SubgroupContext);
-    const url = `${SERVER_URL}/weekList/${weekIndex}/days/${dayIndex}/hometasks`;
+    const auditory = auditories[0];
+    const url = `${SERVER_URL}/weekList/${weekServerIndex}/days/${dayServerIndex}/hometasks`;
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
 
-    useEffect(() => {
-        if (process === 'entering') {
-            const input = document.querySelector('#hometaskInput');
-
-            input.value = hometaskText;
-            input.focus();
-        }
-    }, [process]);
-
     const openModal = () => setOpen(true);
     
-    const closeModal = () => {
-        if (process === 'sending') return;
+    const closeModal = (success = false) => {
+        if (process === 'sending' && !success) return;
 
         setOpen(false);
         setProcess('idle');
@@ -54,8 +46,7 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
     const sendHometask = async () => {
         const text = document.querySelector('#hometaskInput').value;
 
-        if (hometaskText === text) {
-            setProcess('idle');
+        if (hometask === text) {
             closeModal();
             return;
         }
@@ -63,31 +54,28 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
         setProcess('sending');
 
         const finishSending = () => {
-            setHometaskText(text);
-            setHometasks(hometasks => hometasks.map((item, i) => i === dayI ? item.map((task, i) => i === ind ? text : task) : item));
-            setProcess('idle');
-            closeModal();
+            setHometask(text, weekIndex, dayIndex, subjectIndex);
+            closeModal(true);
         }
 
         const changeOrDeleteHometask = async action => {
-            const oldHtList = await request(url, "GET", null, HEADERS);
-
-            if (oldHtList && oldHtList.length) {
-                const newHtList = action === 'change' ? 
+            try {
+                const oldHtList = await request(url, "GET", null, HEADERS);
+                const newHtList = action === 'c' ? 
                 oldHtList.map(ht => ht.subject === subjShort && (subjShort === 'ИнЯз' ? JSON.stringify(ht.teacher) === JSON.stringify(teacher) : true) ? { ...ht, text } : ht) :
                 oldHtList.filter(ht => ht.subject !== subjShort || (subjShort === 'ИнЯз' ? JSON.stringify(ht.teacher) !== JSON.stringify(teacher) : false));
 
-                request(url, "POST", JSON.stringify(newHtList), HEADERS).then(finishSending).catch(() => setProcess('error'));
-            } else {
+                request(url, "POST", JSON.stringify(newHtList), HEADERS).then(finishSending);
+            } catch (error) {
                 setProcess('error');
             }
         }
 
-        if (hometaskText && text) {
-            await changeOrDeleteHometask('change');
-        } else if (hometaskText) {
-            await changeOrDeleteHometask('delete');
-        } else if (text) {
+        if (hometask && text) {
+            await changeOrDeleteHometask('c');
+        } else if (hometask) {
+            await changeOrDeleteHometask('d');
+        } else {
             const body = {
                 subject: subjShort,
                 teacher,
@@ -99,9 +87,9 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
         }
     }
 
-    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, subjShort === 'ФизК' || process === 'idle');
+    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', hometask);
 
-    return subgroup === 0 || subgroupNum === 0 || subgroupNum === subgroup ? (
+    return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
             <div className={`${styles.subject} ${styles.hoverAnimation}`} onClick={openModal}>
                 <div className={styles.left}>
@@ -115,7 +103,7 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
                         { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
                     </div>
                 </div>
-                <p className={styles.htText}>{hometaskText}</p>
+                <p className={styles.htText}>{hometask}</p>
                 {
                     subjShort === 'ФизК' ? null : 
                     <div className={styles.subjInfo}>

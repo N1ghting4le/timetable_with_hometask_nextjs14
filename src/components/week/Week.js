@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import { useIsDesktop, useCurr, useWeek } from "../GlobalContext";
 import Day from "../day/Day";
 import styles from "./week.module.css";
 
-const Week = ({ weekIndex, weekNum, days, curr, prevCurr, isDesktop }) => {
+const Week = ({ weekIndex }) => {
+    const { curr, prevCurr } = useCurr();
+    const { days, weekNum } = useWeek(weekIndex);
+    const isDesktop = useIsDesktop();
     const [display, setDisplay] = useState(curr === weekIndex);
     const [side, setSide] = useState(null);
-    const [hometasks, setHometasks] = useState(days.map(item => item.subjects.map((item => item.hometask))));
     const ref = useRef({});
 
     useEffect(() => {
@@ -31,9 +34,11 @@ const Week = ({ weekIndex, weekNum, days, curr, prevCurr, isDesktop }) => {
     }, [curr]);
 
     const renderDays = () => days.map((item, i) => {
-        const { date, day, subjects, dayNum, notes } = item;
-
-        return <Day key={date} date={date} day={day} subjects={subjects} noteItems={notes} weekIndex={weekNum} dayIndex={dayNum} hometasks={hometasks} setHometasks={setHometasks} i={i}/>;
+        return <Day key={item.date}
+                    weekIndex={weekIndex}
+                    weekServerIndex={weekNum} 
+                    dayServerIndex={item.dayNum} 
+                    dayIndex={i}/>;
     });
 
     const elements = renderDays();

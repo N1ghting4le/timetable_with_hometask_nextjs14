@@ -2,9 +2,14 @@
 
 import styles from './note.module.css';
 
-const Note = ({ id, text }) => {
+const Note = ({ i, text, setOpen, setActiveNoteIndex }) => {
+    const openNote = () => {
+        setOpen(2);
+        setActiveNoteIndex(i);
+    }
+
     return (
-        <div className={styles.note}>{text}</div>
+        <div className={styles.note} onClick={openNote}>{text}</div>
     );
 }
 

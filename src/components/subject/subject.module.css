@@ -96,7 +96,7 @@
     font-size: 1rem;
 }
 
-@media (max-width: 431px) {
+@media (max-width: 576px) {
     .left, .htText {
         font-size: 13px;
     }
@@ -107,7 +107,6 @@
     }
 
     .subject {
-        grid-template-columns: 1fr 2fr 1fr;
         column-gap: 10px;
         padding-inline: 0;
     }
