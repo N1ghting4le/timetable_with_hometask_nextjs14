@@ -38,10 +38,6 @@ const GlobalContext = ({ children }) => {
         prevCurr: globalState.prevCurr,
         isDesktop: globalState.isDesktop,
 
-        setWeekList(weekList) {
-            setGlobalState(state => ({...state, weekList}));
-        },
-
         setSubgroup(subgroup) {
             setGlobalState(state => ({...state, subgroup}));
         },
