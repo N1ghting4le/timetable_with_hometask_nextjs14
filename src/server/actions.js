@@ -98,6 +98,7 @@ const parseTimetable = (response, listOfWeeks) => {
                 date: day.date.substring(0, day.date.lastIndexOf('.')),
                 day: day.day,
                 dayNum: index,
+                notes: day.notes,
                 subjects
             };
         }).filter(day => day && day.subjects.length),

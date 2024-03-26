@@ -31,9 +31,9 @@ const Week = ({ weekIndex, weekNum, days, curr, prevCurr, isDesktop }) => {
     }, [curr]);
 
     const renderDays = () => days.map((item, i) => {
-        const { date, day, subjects, dayNum } = item;
+        const { date, day, subjects, dayNum, notes } = item;
 
-        return <Day key={date} date={date} day={day} subjects={subjects} weekIndex={weekNum} dayIndex={dayNum} hometasks={hometasks} setHometasks={setHometasks} i={i}/>;
+        return <Day key={date} date={date} day={day} subjects={subjects} noteItems={notes} weekIndex={weekNum} dayIndex={dayNum} hometasks={hometasks} setHometasks={setHometasks} i={i}/>;
     });
 
     const elements = renderDays();

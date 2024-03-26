@@ -1,0 +1,12 @@
+.note {
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px gray;
+    width: 100%;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.note:hover {
+    background-color: #f2f2f2;
+}

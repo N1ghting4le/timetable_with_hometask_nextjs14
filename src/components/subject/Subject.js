@@ -1,14 +1,15 @@
 'use client';
 
-import Popup from "reactjs-popup";
+import Modal from "../modal/Modal";
 import Image from "next/image";
+import Btn from "@/components/Btn/Btn";
 import { useState, useMemo, useEffect } from "react";
 import { PHOTO_URL, SERVER_URL, HEADERS } from "@/env/env";
 import { request } from "@/server/actions";
+import { renderElements } from "@/commonFunctions";
 import { SubgroupContext } from "../weekList/WeekList";
 import { useContext } from "react";
 import styles from "./subject.module.css";
-import "./popup.css";
 
 const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, note, weeks, teacher, weekIndex, dayIndex, hometask, setHometasks, dayI, ind }) => {
     const [open, setOpen] = useState(false);
@@ -16,6 +17,7 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
     const [hometaskText, setHometaskText] = useState(hometask);
     const { firstName, middleName, lastName, photoLink } = teacher;
     const subgroupNum = useContext(SubgroupContext);
+    const url = `${SERVER_URL}/weekList/${weekIndex}/days/${dayIndex}/hometasks`;
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -60,8 +62,6 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
 
         setProcess('sending');
 
-        const url = `${SERVER_URL}/weekList/${weekIndex}/days/${dayIndex}/hometasks`;
-
         const finishSending = () => {
             setHometaskText(text);
             setHometasks(hometasks => hometasks.map((item, i) => i === dayI ? item.map((task, i) => i === ind ? text : task) : item));
@@ -99,28 +99,7 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
         }
     }
 
-    const sendHometaskByEnter = (e) => e.code === 'Enter' ? sendHometask() : null;
-
-    const renderElements = () => {
-        if (subjShort === 'ФизК' || process === 'idle') return null;
-
-        return (
-            <>
-                <textarea id="hometaskInput" type="text" className={styles.input} onKeyDown={sendHometaskByEnter}/>
-                {
-                    process === 'sending' ? <p>Отправка...</p> :
-                    <>
-                        <button className={`${styles.button} ${styles.hoverAnimation}`} onClick={sendHometask}>Подтвердить</button>
-                        {
-                            process === 'error' ? <p className={styles.error}>Произошла ошибка (разрабы дауны)</p> : null
-                        }
-                    </>
-                }
-            </>
-        );
-    }
-
-    const elements = renderElements();
+    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, subjShort === 'ФизК' || process === 'idle');
 
     return subgroup === 0 || subgroupNum === 0 || subgroupNum === subgroup ? (
         <li className={styles.wrapper}>
@@ -145,8 +124,7 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
                     </div>
                 }
             </div>
-            <Popup modal open={open} onClose={closeModal}>
-                <div className={styles.closeModal} onClick={closeModal}/>
+            <Modal open={open} onClose={closeModal}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
                 <Image width={180} height={180} src={photoLink ? photoLink : PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
@@ -161,9 +139,9 @@ const Subject = ({ auditory, start, end, subgroup, subject, subjShort, type, not
                         <span className={styles.timetableItem}>{subgroup ? `подгр. ${subgroup}` : ''}</span>
                     </div>
                 </div>
-                {subjShort !== 'ФизК' ? <button className={`${styles.button} ${styles.hoverAnimation}`} onClick={startEntering}>Д/З</button> : null}
+                {subjShort !== 'ФизК' ? <Btn onClick={startEntering}>Д/З</Btn> : null}
                 {elements}
-            </Popup>
+            </Modal>
         </li>
     ) : null;
 }
