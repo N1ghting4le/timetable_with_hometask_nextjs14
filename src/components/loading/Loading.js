@@ -14,7 +14,7 @@ const Loading = () => {
 
     return (
         <div className={styles.loading}>
-            <Image src={`/sticker${tynkovich}.webp`} alt="Tynkovich vertitsya" width={200} height={200} className={styles.image}/>
+            <Image src={`/sticker${tynkovich}.webp`} priority={true} alt="Tynkovich vertitsya" width={200} height={200} className={styles.image}/>
         </div>
     );
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import styles from './note.module.css';
 
 const Note = ({ i, text, setOpen, setActiveNoteIndex }) => {
@@ -8,9 +6,7 @@ const Note = ({ i, text, setOpen, setActiveNoteIndex }) => {
         setActiveNoteIndex(i);
     }
 
-    return (
-        <div className={styles.note} onClick={openNote}>{text}</div>
-    );
+    return <div className={styles.note} onClick={openNote}>{text}</div>;
 }
 
 export default Note;

@@ -13,7 +13,7 @@ import styles from "./day.module.css";
 import { renderElements } from "@/commonFunctions";
 
 const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
-    const { date, day, subjects, notes, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
+    const { date, day, subjects, notes, hometasks, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const [open, setOpen] = useState(0);
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
@@ -23,12 +23,17 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
 
-    const renderSubjects = () => subjects.map((_, j) => <Subject key={j}
-                                                                 weekIndex={weekIndex}
-                                                                 dayIndex={dayIndex}
-                                                                 subjectIndex={j}
-                                                                 weekServerIndex={weekServerIndex}
-                                                                 dayServerIndex={dayServerIndex}/>);
+    const renderSubjects = () => subjects.map((s, j) => {
+        const text = hometasks[s.htIndex]?.text || '';
+
+        return <Subject key={j}
+                        weekIndex={weekIndex}
+                        dayIndex={dayIndex}
+                        subjectIndex={j}
+                        hometask={text}
+                        weekServerIndex={weekServerIndex}
+                        dayServerIndex={dayServerIndex}/>;
+    });
 
     const renderNotes = () => notes.length ? 
     notes.map((note, i) => <Note key={note.id} 
@@ -66,6 +71,12 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
             setOpen(1);
         }
 
+        const send = (method, body, newNoteList) => {
+            request(url, method, JSON.stringify(body), HEADERS)
+            .then(() => finishSending(newNoteList))
+            .catch(() => setProcess('error'));
+        }
+
         if ((text === activeNote?.text && !toDelete) || text === '') {
             setOpen(1);
             setActiveNoteIndex(-1);
@@ -80,17 +91,13 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
                 text
             }
     
-            request(url, "PATCH", JSON.stringify(body), HEADERS)
-            .then(() => finishSending([...notes, body]))
-            .catch(() => setProcess('error'));
+            send("PATCH", body, [...notes, body]);
         } else {
             const newNoteList = toDelete ?
             deleteNote(weekIndex, dayIndex, activeNoteIndex) : 
             editNote(text, weekIndex, dayIndex, activeNoteIndex);
 
-            request(url, "POST", JSON.stringify(newNoteList), HEADERS)
-            .then(() => finishSending(newNoteList))
-            .catch(() => setProcess('error'));
+            send("POST", newNoteList, newNoteList);
         }
     }
 

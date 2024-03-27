@@ -21,15 +21,11 @@ const Week = ({ weekIndex }) => {
                 return prevCurr < weekIndex ? styles.fromRight : null;
             });
         } else if (display) {
-            if (isDesktop) {
-                setTimeout(() => {
-                    setDisplay(false);
-                }, 300);
+            if (!isDesktop) return setDisplay(false);
+
+            setTimeout(() => setDisplay(false), 300);
     
-                ref.current.style.transform = curr > weekIndex ? "translateX(-100%)" : "translateX(100%)";
-            } else {
-                setDisplay(false);
-            }
+            ref.current.style.transform = `translateX(${curr > weekIndex ? -100 : 100}%)`;
         }
     }, [curr]);
 

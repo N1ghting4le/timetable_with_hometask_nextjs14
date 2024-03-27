@@ -46,15 +46,54 @@ const GlobalContext = ({ children }) => {
             setGlobalState(state => ({...state, prevCurr: state.curr, curr}));
         },
 
-        setHometask(text, weekIndex, dayIndex, subjIndex) {
-            const weekList = [...globalState.weekList];
+        getEditedHtList(weekIndex, dayIndex, htIndex, text) {
+            const { hometasks } = globalState.weekList[weekIndex].days[dayIndex];
 
-            weekList[weekIndex].days[dayIndex].subjects[subjIndex].hometask = text;
+            return text ?
+            hometasks.map((ht, i) => i === htIndex ? ({...ht, text}) : ht) :
+            hometasks.filter((_, i) => i !== htIndex);
+        },
+
+        addHometask(hometask, weekIndex, dayIndex, subjIndex) {
+            const weekList = globalState.weekList,
+                  { subjects, hometasks } = globalState.weekList[weekIndex].days[dayIndex],
+                  subject = subjects[subjIndex];
+
+            subject.htIndex = hometasks.push(hometask) - 1;
+            setGlobalState(state => ({...state, weekList}));
+        },
+
+        editHometask(htList, weekIndex, dayIndex) {
+            const weekList = globalState.weekList;
+
+            weekList[weekIndex].days[dayIndex].hometasks = htList;
+            setGlobalState(state => ({...state, weekList}));
+        },
+
+        deleteHometask(htList, htIndex, weekIndex, dayIndex) {
+            const weekList = globalState.weekList,
+                  day = weekList[weekIndex].days[dayIndex];
+
+            day.hometasks = htList;
+
+            day.subjects.forEach(item => {
+                if (item.htIndex < 0) return;
+
+                if (item.htIndex === htIndex) {
+                    item.htIndex = -1;
+                    return;
+                }
+
+                if (item.htIndex > htIndex) {
+                    item.htIndex--;
+                }
+            });
+
             setGlobalState(state => ({...state, weekList}));
         },
 
         setNotes(newNoteList, weekIndex, dayIndex) {
-            const weekList = [...globalState.weekList];
+            const weekList = globalState.weekList;
 
             weekList[weekIndex].days[dayIndex].notes = newNoteList;
             setGlobalState(state => ({...state, weekList}));
@@ -95,9 +134,10 @@ const useDay = (weekIndex, dayIndex) => {
 
 const useSubject = (weekIndex, dayIndex, subjectIndex) => {
     const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
-          setHometask = useContext(Context).setHometask;
+          context = useContext(Context),
+          { addHometask, editHometask, deleteHometask, getEditedHtList } = context;
 
-    return { ...subject, setHometask };
+    return { ...subject, addHometask, editHometask, deleteHometask, getEditedHtList };
 }
 
 const useCurr = () => {

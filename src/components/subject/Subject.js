@@ -10,8 +10,11 @@ import { renderElements } from "@/commonFunctions";
 import { useSubgroup, useSubject } from "../GlobalContext";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, weekServerIndex, dayServerIndex }) => {
-    const { auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, hometask, setHometask } = useSubject(weekIndex, dayIndex, subjectIndex);
+const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex, dayServerIndex }) => {
+    const { 
+        auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, 
+        htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
+    } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
@@ -43,7 +46,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, weekServerIndex, dayServer
 
     const startEntering = () => setProcess('entering');
 
-    const sendHometask = async () => {
+    const sendHometask = () => {
         const text = document.querySelector('#hometaskInput').value;
 
         if (hometask === text) {
@@ -53,28 +56,23 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, weekServerIndex, dayServer
 
         setProcess('sending');
 
-        const finishSending = () => {
-            setHometask(text, weekIndex, dayIndex, subjectIndex);
-            closeModal(true);
-        }
+        const changeOrDeleteHometask = action => {
+            const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
 
-        const changeOrDeleteHometask = async action => {
-            try {
-                const oldHtList = await request(url, "GET", null, HEADERS);
-                const newHtList = action === 'c' ? 
-                oldHtList.map(ht => ht.subject === subjShort && (subjShort === 'ИнЯз' ? JSON.stringify(ht.teacher) === JSON.stringify(teacher) : true) ? { ...ht, text } : ht) :
-                oldHtList.filter(ht => ht.subject !== subjShort || (subjShort === 'ИнЯз' ? JSON.stringify(ht.teacher) !== JSON.stringify(teacher) : false));
-
-                request(url, "POST", JSON.stringify(newHtList), HEADERS).then(finishSending);
-            } catch (error) {
-                setProcess('error');
-            }
+            request(url, "POST", JSON.stringify(newHtList), HEADERS)
+            .then(() => {
+                action === 'c' ? 
+                editHometask(newHtList, weekIndex, dayIndex) :
+                deleteHometask(newHtList, htIndex, weekIndex, dayIndex);
+                closeModal(true);
+            })
+            .catch(() => setProcess('error'));
         }
 
         if (hometask && text) {
-            await changeOrDeleteHometask('c');
+            changeOrDeleteHometask('c');
         } else if (hometask) {
-            await changeOrDeleteHometask('d');
+            changeOrDeleteHometask('d');
         } else {
             const body = {
                 subject: subjShort,
@@ -83,7 +81,12 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, weekServerIndex, dayServer
                 text 
             }
 
-            request(url, "PATCH", JSON.stringify(body), HEADERS).then(finishSending).catch(() => setProcess('error'));
+            request(url, "PATCH", JSON.stringify(body), HEADERS)
+            .then(() => {
+                addHometask(body, weekIndex, dayIndex, subjectIndex);
+                closeModal(true);
+            })
+            .catch(() => setProcess('error'));
         }
     }
 
