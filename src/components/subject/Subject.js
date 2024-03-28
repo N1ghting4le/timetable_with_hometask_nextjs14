@@ -50,8 +50,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
         const text = document.querySelector('#hometaskInput').value;
 
         if (hometask === text) {
-            closeModal();
-            return;
+            return closeModal();
         }
 
         setProcess('sending');
@@ -94,7 +93,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
-            <div className={`${styles.subject} ${styles.hoverAnimation}`} onClick={openModal}>
+            <div className={styles.subject} onClick={openModal}>
                 <div className={styles.left}>
                     <div>
                         <p>{start}</p>
@@ -123,7 +122,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
                     <div className={styles.timetableColumn}>
                         <span className={styles.time}>{start} - {end}</span>
                         <span className={styles.timetableItem}>{auditory}</span>
-                        { note ? <span className={styles.timetableItem}>{note}</span> : null }
+                        <span className={styles.timetableItem}>{note}</span>
                     </div>
                     <div className={styles.timetableColumn}>
                         <span className={styles.timetableItem}>{weeks.length === 4 ? '' : `нед. ${weeks.join()}`}</span>

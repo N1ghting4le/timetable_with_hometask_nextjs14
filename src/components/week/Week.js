@@ -29,13 +29,13 @@ const Week = ({ weekIndex }) => {
         }
     }, [curr]);
 
-    const renderDays = () => days.map((item, i) => {
-        return <Day key={item.date}
-                    weekIndex={weekIndex}
-                    weekServerIndex={weekNum} 
-                    dayServerIndex={item.dayNum} 
-                    dayIndex={i}/>;
-    });
+    const renderDays = () => days.map((item, i) => (
+        <Day key={item.date}
+             weekIndex={weekIndex}
+             weekServerIndex={weekNum} 
+             dayServerIndex={item.dayNum} 
+             dayIndex={i}/>
+    ));
 
     const elements = renderDays();
 

@@ -36,11 +36,11 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
     });
 
     const renderNotes = () => notes.length ? 
-    notes.map((note, i) => <Note key={note.id} 
-                                 i={i} 
-                                 text={note.text} 
-                                 setOpen={setOpen}
-                                 setActiveNoteIndex={setActiveNoteIndex}/>) : <h2>Нет заметок</h2>;
+    notes.map((note, i) => {
+        const { id, text } = note;
+
+        return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
+    }) : <h2>Нет заметок</h2>;
 
     const openModal = (i) => setOpen(i);
     
@@ -53,22 +53,20 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
     }
 
     const goBack = () => {
-        if (process === 'sending') return;
-
         setOpen(1);
         setActiveNoteIndex(-1);
         setProcess('idle');
     }
 
     const sendNote = (toDelete = false) => {
+        if (process === 'sending') return;
+
         const text = document.querySelector("#noteInput").value;
         const activeNote = notes[activeNoteIndex];
 
         const finishSending = (newNoteList) => {
             setNotes(newNoteList, weekIndex, dayIndex);
-            setActiveNoteIndex(-1);
-            setProcess('idle');
-            setOpen(1);
+            goBack();
         }
 
         const send = (method, body, newNoteList) => {
@@ -78,9 +76,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         }
 
         if ((text === activeNote?.text && !toDelete) || text === '') {
-            setOpen(1);
-            setActiveNoteIndex(-1);
-            return;
+            return goBack();
         }
 
         setProcess('sending');
@@ -134,7 +130,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
                        width={25} 
                        height={25}
                        className={styles.backArrow}
-                       onClick={goBack}/>
+                       onClick={() => process !== 'sending' ? goBack() : null}/>
                 { activeNoteIndex >= 0 ?
                     <>
                         <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
