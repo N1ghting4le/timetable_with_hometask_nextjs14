@@ -63,7 +63,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
         const text = document.querySelector("#noteInput").value;
         const activeNote = notes[activeNoteIndex];
-
+        
         const finishSending = (newNoteList) => {
             setNotes(newNoteList, weekIndex, dayIndex);
             goBack();
@@ -110,7 +110,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
     const subjectElems = renderSubjects();
     const noteElems = renderNotes();
-    const elements = renderElements("noteInput", styles.input, sendNote, process, styles.error, open < 2, notes[activeNoteIndex]?.text);
+    const elements = renderElements("noteInput", styles.input, () => sendNote(), process, styles.error, open < 2, notes[activeNoteIndex]?.text);
 
     return (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
