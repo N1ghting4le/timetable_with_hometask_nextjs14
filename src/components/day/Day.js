@@ -12,6 +12,39 @@ import { useDay } from "../GlobalContext";
 import styles from "./day.module.css";
 import { renderElements } from "@/commonFunctions";
 
+const View1 = ({ noteElems, setOpen }) => (
+    <>
+        {noteElems}
+        <div className={styles.wrapper}>
+            <Btn className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</Btn>
+        </div>
+    </>
+);
+
+const View2 = ({ elements, closeModal, activeNoteIndex, sendNote }) => (
+    <>
+        <Image src="https://img.icons8.com/windows/32/return.png" 
+                alt="return arrow" 
+                width={25} 
+                height={25}
+                className={styles.backArrow}
+                onClick={() => closeModal(1)}/>
+        { 
+            activeNoteIndex >= 0 ?
+            <>
+                <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
+                <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
+                        alt="rubbish bin icon" 
+                        width={30} 
+                        height={30} 
+                        className={styles.rubbishBin} 
+                        onClick={() => sendNote(true)}/>
+            </> : <h2>Новая заметка</h2> 
+        }
+        {elements}
+    </>
+);
+
 const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
     const { date, day, subjects, notes, hometasks, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const [open, setOpen] = useState(0);
@@ -24,7 +57,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
     }, [open]);
 
     const renderSubjects = () => subjects.map((s, j) => {
-        const text = hometasks[s.htIndex]?.text || '';
+        const text = hometasks[s.htIndex]?.text;
 
         return <Subject key={j}
                         weekIndex={weekIndex}
@@ -42,18 +75,12 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
     }) : <h2>Нет заметок</h2>;
 
-    const openModal = (i) => setOpen(i);
+    const openModal = () => setOpen(1);
     
-    const closeModal = (i) => {
-        if (open !== i || process === 'sending') return;
+    const closeModal = (num = 0, success = false) => {
+        if (!success && process === 'sending') return;
 
-        setOpen(0);
-        setActiveNoteIndex(-1);
-        setProcess('idle');
-    }
-
-    const goBack = () => {
-        setOpen(1);
+        setOpen(num);
         setActiveNoteIndex(-1);
         setProcess('idle');
     }
@@ -63,20 +90,18 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
         const text = document.querySelector("#noteInput").value;
         const activeNote = notes[activeNoteIndex];
-        
-        const finishSending = (newNoteList) => {
-            setNotes(newNoteList, weekIndex, dayIndex);
-            goBack();
-        }
 
         const send = (method, body, newNoteList) => {
             request(url, method, JSON.stringify(body), HEADERS)
-            .then(() => finishSending(newNoteList))
+            .then(() => {
+                setNotes(newNoteList, weekIndex, dayIndex);
+                closeModal(1, true);
+            })
             .catch(() => setProcess('error'));
         }
 
-        if ((text === activeNote?.text && !toDelete) || text === '') {
-            return goBack();
+        if ((text === activeNote?.text && !toDelete) || !text) {
+            return closeModal(1);
         }
 
         setProcess('sending');
@@ -114,35 +139,16 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
     return (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
-            <p className={styles.text} onClick={() => openModal(1)}>{date}, {day}{ notes.length ? `, ${notes.length} замет${strEnd()}` : '' }</p>
+            <p className={styles.text} onClick={openModal}>{date}, {day}{ notes.length ? `, ${notes.length} замет${strEnd()}` : '' }</p>
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>
-            <Modal open={open === 1} onClose={() => closeModal(1)} style={{ paddingTop: "30px" }}>
-                {noteElems}
-                <div className={styles.wrapper}>
-                    <Btn className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</Btn>
-                </div>
-            </Modal>
-            <Modal open={open === 2} onClose={() => closeModal(2)}>
-                <Image src="https://img.icons8.com/windows/32/return.png" 
-                       alt="return arrow" 
-                       width={25} 
-                       height={25}
-                       className={styles.backArrow}
-                       onClick={() => process !== 'sending' ? goBack() : null}/>
-                { activeNoteIndex >= 0 ?
-                    <>
-                        <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
-                        <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
-                               alt="rubbish bin icon" 
-                               width={30} 
-                               height={30} 
-                               className={styles.rubbishBin} 
-                               onClick={() => sendNote(true)}/>
-                    </> : <h2>Новая заметка</h2> 
+            <Modal open={!!open} onClose={() => closeModal()} style={open === 1 ? { paddingTop: "30px" } : null}>
+                { 
+                    open === 1 ? 
+                    <View1 noteElems={noteElems} setOpen={setOpen}/> : 
+                    <View2 elements={elements} closeModal={closeModal} activeNoteIndex={activeNoteIndex} sendNote={sendNote}/> 
                 }
-                {elements}
             </Modal>
         </div>
     );

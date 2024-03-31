@@ -3,7 +3,7 @@
 import Modal from "../modal/Modal";
 import Image from "next/image";
 import Btn from "@/components/Btn/Btn";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { PHOTO_URL, SERVER_URL, HEADERS } from "@/env/env";
 import { request } from "@/server/actions";
 import { renderElements } from "@/commonFunctions";
@@ -36,17 +36,19 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
         setProcess('idle');
     }
 
-    const color = useMemo(() => {
+    const color = () => {
         switch (type) {
             case 'ЛК': return 'green';
             case 'ПЗ': return 'yellow';
             case 'ЛР': return 'red';
         }
-    }, [type]);
+    }
 
     const startEntering = () => setProcess('entering');
 
     const sendHometask = () => {
+        if (process === 'sending') return;
+
         const text = document.querySelector('#hometaskInput').value;
 
         if (hometask === text) {
@@ -99,7 +101,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
                         <p>{start}</p>
                         <p className={styles.smaller}>{end}</p>
                     </div>
-                    <div className={styles.line} style={{backgroundColor: color}}/>
+                    <div className={styles.line} style={{backgroundColor: color()}}/>
                     <div className={styles.textWrapper}>
                         <p>{subjShort} ({type})</p>
                         { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
@@ -116,7 +118,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
             </div>
             <Modal open={open} onClose={closeModal}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
-                <Image width={180} height={180} src={photoLink ? photoLink : PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color}}/>
+                <Image width={180} height={180} src={photoLink ? photoLink : PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
                 <div className={styles.timetable}>
                     <div className={styles.timetableColumn}>
