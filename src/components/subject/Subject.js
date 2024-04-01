@@ -47,8 +47,6 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
     const startEntering = () => setProcess('entering');
 
     const sendHometask = () => {
-        if (process === 'sending') return;
-
         const text = document.querySelector('#hometaskInput').value;
 
         if (hometask === text) {

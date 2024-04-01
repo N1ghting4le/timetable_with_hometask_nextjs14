@@ -6,33 +6,14 @@
 
 .closeModal {
 	position: fixed;
-	transform: translateX(-100%);
-	width: 15px;
-	height: 15px;
+	transform: translate(-90%, -30%);
+	font-size: 25.5px;
+	font-weight: bold;
 	opacity: 0.5;
 	cursor: pointer;
-    transition: opacity ease 0.5s;
+    transition: opacity ease 0.2s;
 }
 
 .closeModal:hover {
     opacity: 1;
-}
-
-.closeModal::before,
-.closeModal::after {
-	content: '';
-	position: absolute;
-    top: 6px;
-	display: block;
-	width: 15px;
-	height: 3px;
-	background: #000;
-}
-
-.closeModal::before {
-	transform: rotate(45deg);
-}
-
-.closeModal::after {
-	transform: rotate(-45deg);
 }

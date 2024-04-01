@@ -91,6 +91,10 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         const text = document.querySelector("#noteInput").value;
         const activeNote = notes[activeNoteIndex];
 
+        if ((text === activeNote?.text && !toDelete) || !text) {
+            return closeModal(1);
+        }
+
         const send = (method, body, newNoteList) => {
             request(url, method, JSON.stringify(body), HEADERS)
             .then(() => {
@@ -98,10 +102,6 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
                 closeModal(1, true);
             })
             .catch(() => setProcess('error'));
-        }
-
-        if ((text === activeNote?.text && !toDelete) || !text) {
-            return closeModal(1);
         }
 
         setProcess('sending');
@@ -122,6 +122,14 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         }
     }
 
+    const renderModal = (noteElems, elements) => {
+        switch (open) {
+            case 1: return <View1 noteElems={noteElems} setOpen={setOpen}/>;
+            case 2: return <View2 elements={elements} closeModal={closeModal} activeNoteIndex={activeNoteIndex} sendNote={sendNote}/>;
+            default: return null;
+        }
+    }
+
     const strEnd = () => {
         if (notes.length > 4 && notes.length < 21) return "ок";
 
@@ -136,6 +144,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
     const subjectElems = renderSubjects();
     const noteElems = renderNotes();
     const elements = renderElements("noteInput", styles.input, () => sendNote(), process, styles.error, open < 2, notes[activeNoteIndex]?.text);
+    const modal = renderModal(noteElems, elements);
 
     return (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
@@ -144,11 +153,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
                 {subjectElems}
             </ul>
             <Modal open={!!open} onClose={() => closeModal()} style={open === 1 ? { paddingTop: "30px" } : null}>
-                { 
-                    open === 1 ? 
-                    <View1 noteElems={noteElems} setOpen={setOpen}/> : 
-                    <View2 elements={elements} closeModal={closeModal} activeNoteIndex={activeNoteIndex} sendNote={sendNote}/> 
-                }
+                {modal}
             </Modal>
         </div>
     );
