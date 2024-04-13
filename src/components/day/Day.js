@@ -1,6 +1,6 @@
 'use client';
 
-import { SERVER_URL, HEADERS } from "@/env/env";
+import { SERVER_URL } from "@/env/env";
 import Modal from "../modal/Modal";
 import Subject from "../subject/Subject";
 import Note from "../Note/Note";
@@ -11,6 +11,7 @@ import { request } from "@/server/actions";
 import { useDay } from "../GlobalContext";
 import styles from "./day.module.css";
 import { renderElements } from "@/commonFunctions";
+import { v4 as uuid } from 'uuid';
 
 const View1 = ({ noteElems, setOpen }) => (
     <>
@@ -45,12 +46,12 @@ const View2 = ({ elements, closeModal, activeNoteIndex, sendNote }) => (
     </>
 );
 
-const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
+const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
     const { date, day, subjects, notes, hometasks, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const [open, setOpen] = useState(0);
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
-    const url = `${SERVER_URL}/weekList/${weekServerIndex}/days/${dayServerIndex}/notes`;
+    const url = `${SERVER_URL}/weekList/${weekId}/days/${dayServerIndex}/notes`;
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -58,13 +59,17 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
     const renderSubjects = () => subjects.map((s, j) => {
         const text = hometasks[s.htIndex]?.text;
+        const id = hometasks[s.htIndex]?.id;
+        const teacher = hometasks[s.htIndex]?.teacher;
 
         return <Subject key={j}
                         weekIndex={weekIndex}
                         dayIndex={dayIndex}
                         subjectIndex={j}
                         hometask={text}
-                        weekServerIndex={weekServerIndex}
+                        htId={id}
+                        htTeacher={teacher}
+                        weekServerIndex={weekId}
                         dayServerIndex={dayServerIndex}/>;
     });
 
@@ -96,7 +101,7 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
         }
 
         const send = (method, body, newNoteList) => {
-            request(url, method, JSON.stringify(body), HEADERS)
+            request(url, method, JSON.stringify(body))
             .then(() => {
                 setNotes(newNoteList, weekIndex, dayIndex);
                 closeModal(1, true);
@@ -108,17 +113,15 @@ const Day = ({ weekIndex, weekServerIndex, dayIndex, dayServerIndex }) => {
 
         if (!activeNote) {
             const body = {
-                id: notes.length + 1,
+                id: uuid(),
                 text
-            }
-    
-            send("PATCH", body, [...notes, body]);
-        } else {
-            const newNoteList = toDelete ?
-            deleteNote(weekIndex, dayIndex, activeNoteIndex) : 
-            editNote(text, weekIndex, dayIndex, activeNoteIndex);
+            };
 
-            send("POST", newNoteList, newNoteList);
+            send("POST", body, [...notes, body]);
+        } else if (toDelete) {
+            send("DELETE", activeNote, deleteNote(weekIndex, dayIndex, activeNoteIndex));
+        } else {
+            send("PATCH", [activeNote, {...activeNote, text}], editNote(text, weekIndex, dayIndex, activeNoteIndex));
         }
     }
 

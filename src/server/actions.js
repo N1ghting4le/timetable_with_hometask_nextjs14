@@ -1,27 +1,26 @@
 'use server';
 
-import { API_URL, SERVER_URL, HEADERS } from "@/env/env";
+import { API_URL, SERVER_URL } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
-    try {
-        const res = await fetch(url, { method, headers, body, cache: 'no-store' });
-    
-        if (!res.ok) {
-            throw new Error(`Failed to fetch ${url}, status: ${res.status}`);
-        }
+    return fetch(url, { method, headers, body, cache: 'no-store' })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
+                }
 
-        return res.json();        
-    } catch (error) {
-        console.error(`Error: ${error.code}`);
-    }
+                return res.json();
+            })
+            .catch(e => {
+                throw new Error(`Error while fetching ${url}: ${e.message}`);
+            });
 }
 
 export default async function getTimetable() {
-    return new Promise(async (resolve, reject) => {
-        const response = await request(API_URL);
-        const weekList = await request(`${SERVER_URL}/weekList`, "GET", null, HEADERS);
-        
-        response && weekList ? resolve(parseTimetable(response, weekList)) : reject();
+    return new Promise((resolve, reject) => {
+        Promise.all([request(API_URL), request(`${SERVER_URL}/weekList`)])
+                .then(values => resolve(parseTimetable(...values)))
+                .catch(error => reject(error));
     });
 }
 
@@ -106,13 +105,12 @@ const parseTimetable = (response, listOfWeeks) => {
             return {
                 date: day.date.substring(0, day.date.lastIndexOf('.')),
                 day: day.day,
-                dayNum: index,
+                dayNum: index + 1,
                 notes: day.notes,
                 hometasks: day.hometasks,
                 subjects
             };
-        }).filter(day => day && day.subjects.length),
-        weekNum: i
+        }).filter(day => day && day.subjects.length)
     })).filter((item, i) => {
         if (!item.days.length && firstEmptyWeek < 0) {
             lastEmptyWeek = firstEmptyWeek = i;

@@ -22,8 +22,8 @@ const GlobalContext = ({ children }) => {
 
             setGlobalState(state => ({...state, weekList, curr, prevCurr: curr}));
         })
-        .catch(() => {
-            throw new Error("Could not fetch nessessary data");
+        .catch(err => {
+            console.error(err);
         });
 
         const md = new MobileDetect(navigator.userAgent);
@@ -101,8 +101,7 @@ const GlobalContext = ({ children }) => {
 
         deleteNote(weekIndex, dayIndex, noteIndex) {
             return globalState.weekList[weekIndex].days[dayIndex].notes
-                    .filter((_, i) => i !== noteIndex)
-                    .map((note, i) => ({...note, id: i + 1}));
+                    .filter((_, i) => i !== noteIndex);
         },
 
         editNote(text, weekIndex, dayIndex, noteIndex) {

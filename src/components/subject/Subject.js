@@ -4,13 +4,14 @@ import Modal from "../modal/Modal";
 import Image from "next/image";
 import Btn from "@/components/Btn/Btn";
 import { useState, useEffect } from "react";
-import { PHOTO_URL, SERVER_URL, HEADERS } from "@/env/env";
+import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import { request } from "@/server/actions";
 import { renderElements } from "@/commonFunctions";
 import { useSubgroup, useSubject } from "../GlobalContext";
+import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex, dayServerIndex }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher, weekServerIndex, dayServerIndex }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, 
         htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
@@ -57,8 +58,11 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
 
         const changeOrDeleteHometask = action => {
             const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
+            const method = action === 'c' ? "PATCH" : "DELETE";
+            const oldHometask = { id: htId, subject: subjShort, teacher: htTeacher, type, text: hometask };
+            const body = action === 'c' ? [oldHometask, {...oldHometask, teacher, text}] : oldHometask;
 
-            request(url, "POST", JSON.stringify(newHtList), HEADERS)
+            request(url, method, JSON.stringify(body))
             .then(() => {
                 action === 'c' ? 
                 editHometask(newHtList, weekIndex, dayIndex) :
@@ -74,13 +78,14 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, weekServerIndex,
             changeOrDeleteHometask('d');
         } else {
             const body = {
+                id: uuid(),
                 subject: subjShort,
                 teacher,
                 type,
                 text 
             }
 
-            request(url, "PATCH", JSON.stringify(body), HEADERS)
+            request(url, "POST", JSON.stringify(body))
             .then(() => {
                 addHometask(body, weekIndex, dayIndex, subjectIndex);
                 closeModal(true);
