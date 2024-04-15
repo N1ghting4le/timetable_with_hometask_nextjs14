@@ -59,8 +59,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher,
         const changeOrDeleteHometask = action => {
             const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
             const method = action === 'c' ? "PATCH" : "DELETE";
-            const oldHometask = { id: htId, subject: subjShort, teacher: htTeacher, type, text: hometask };
-            const body = action === 'c' ? [oldHometask, {...oldHometask, teacher, text}] : oldHometask;
+            const oldHometask = { subject: subjShort, type, text: hometask, teacher: htTeacher, id: htId };
+            const body = action === 'c' ? [oldHometask, {...oldHometask, text, teacher}] : oldHometask;
 
             request(url, method, JSON.stringify(body))
             .then(() => {
@@ -78,11 +78,11 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher,
             changeOrDeleteHometask('d');
         } else {
             const body = {
-                id: uuid(),
                 subject: subjShort,
-                teacher,
                 type,
-                text 
+                text,
+                teacher,
+                id: uuid(),
             }
 
             request(url, "POST", JSON.stringify(body))
