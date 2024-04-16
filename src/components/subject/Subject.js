@@ -100,17 +100,19 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher,
         <li className={styles.wrapper}>
             <div className={styles.subject} onClick={openModal}>
                 <div className={styles.left}>
-                    <div>
+                    <div className={styles.time}>
                         <p>{start}</p>
                         <p className={styles.smaller}>{end}</p>
                     </div>
                     <div className={styles.line} style={{backgroundColor: color()}}/>
                     <div className={styles.textWrapper}>
-                        <p>{subjShort} ({type})</p>
-                        { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
+                        <div className={styles.subjAndType}>
+                            <p>{subjShort} ({type})</p>
+                            { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
+                        </div>
+                        { hometask ? <p className={styles.htText}>{hometask}</p> : null}
                     </div>
                 </div>
-                <p className={styles.htText}>{hometask}</p>
                 {
                     subjShort === 'ФизК' ? null : 
                     <div className={styles.subjInfo}>
