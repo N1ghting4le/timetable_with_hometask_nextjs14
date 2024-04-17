@@ -66,7 +66,7 @@ const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
                         weekIndex={weekIndex}
                         dayIndex={dayIndex}
                         subjectIndex={j}
-                        hometask={text}
+                        hometask={text || ''}
                         htId={id}
                         htTeacher={teacher}
                         weekServerIndex={weekId}
