@@ -11,7 +11,7 @@ import { useSubgroup, useSubject } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher, weekServerIndex, dayServerIndex }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, day }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, 
         htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
@@ -22,7 +22,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher,
     const [open, setOpen] = useState(false);
     const [process, setProcess] = useState('idle');
     const auditory = auditories[0];
-    const url = `${SERVER_URL}/weekList/${weekServerIndex}/days/${dayServerIndex}/hometasks`;
+    const url = `${SERVER_URL}/hometasks`;
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -50,47 +50,33 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, htTeacher,
     const sendHometask = () => {
         const text = document.querySelector('#hometaskInput').value;
 
-        if (hometask === text) {
-            return closeModal();
+        if (hometask === text) return closeModal();
+
+        const send = (method, body, modifier, ...args) => {
+            request(url, method, JSON.stringify(body))
+                .then(() => {
+                    modifier(...args);
+                    closeModal(true);
+                })
+                .catch(() => setProcess('error'));
         }
 
         setProcess('sending');
 
-        const changeOrDeleteHometask = action => {
+        if (hometask) {
             const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
-            const method = action === 'c' ? "PATCH" : "DELETE";
-            const oldHometask = { subject: subjShort, type, text: hometask, teacher: htTeacher, id: htId };
-            const body = action === 'c' ? [oldHometask, {...oldHometask, text, teacher}] : oldHometask;
 
-            request(url, method, JSON.stringify(body))
-            .then(() => {
-                action === 'c' ? 
-                editHometask(newHtList, weekIndex, dayIndex) :
-                deleteHometask(newHtList, htIndex, weekIndex, dayIndex);
-                closeModal(true);
-            })
-            .catch(() => setProcess('error'));
-        }
+            if (text) {
+                const body = { id: htId, day, subject: subjShort, type, teacher, text };
 
-        if (hometask && text) {
-            changeOrDeleteHometask('c');
-        } else if (hometask) {
-            changeOrDeleteHometask('d');
-        } else {
-            const body = {
-                subject: subjShort,
-                type,
-                text,
-                teacher,
-                id: uuid(),
+                send("POST", body, editHometask, newHtList, weekIndex, dayIndex);
+            } else {
+                send("DELETE", { id: htId }, deleteHometask, newHtList, htIndex, weekIndex, dayIndex);
             }
+        } else {
+            const body = { id: uuid(), day, subject: subjShort, type, teacher, text };
 
-            request(url, "POST", JSON.stringify(body))
-            .then(() => {
-                addHometask(body, weekIndex, dayIndex, subjectIndex);
-                closeModal(true);
-            })
-            .catch(() => setProcess('error'));
+            send("POST", body, addHometask, body, weekIndex, dayIndex, subjectIndex);
         }
     }
 

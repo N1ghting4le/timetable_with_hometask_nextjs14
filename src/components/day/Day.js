@@ -46,12 +46,13 @@ const View2 = ({ elements, closeModal, activeNoteIndex, sendNote }) => (
     </>
 );
 
-const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
+const Day = ({ weekIndex, dayIndex }) => {
     const { date, day, subjects, notes, hometasks, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const [open, setOpen] = useState(0);
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
-    const url = `${SERVER_URL}/weekList/${weekId}/days/${dayServerIndex}/notes`;
+    const url = `${SERVER_URL}/notes`;
+    const dateObj = new Date(date);
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -60,7 +61,6 @@ const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
     const renderSubjects = () => subjects.map((s, j) => {
         const text = hometasks[s.htIndex]?.text;
         const id = hometasks[s.htIndex]?.id;
-        const teacher = hometasks[s.htIndex]?.teacher;
 
         return <Subject key={j}
                         weekIndex={weekIndex}
@@ -68,9 +68,7 @@ const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
                         subjectIndex={j}
                         hometask={text || ''}
                         htId={id}
-                        htTeacher={teacher}
-                        weekServerIndex={weekId}
-                        dayServerIndex={dayServerIndex}/>;
+                        day={dateObj}/>;
     });
 
     const renderNotes = () => notes.length ? 
@@ -114,14 +112,15 @@ const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
         if (!activeNote) {
             const body = {
                 id: uuid(),
+                day: dateObj,
                 text
             };
 
             send("POST", body, [...notes, body]);
         } else if (toDelete) {
-            send("DELETE", activeNote, deleteNote(weekIndex, dayIndex, activeNoteIndex));
+            send("DELETE", { id: activeNote.id }, deleteNote(weekIndex, dayIndex, activeNoteIndex));
         } else {
-            send("PATCH", [activeNote, {...activeNote, text}], editNote(text, weekIndex, dayIndex, activeNoteIndex));
+            send("POST", {...activeNote, text, day: dateObj}, editNote(text, weekIndex, dayIndex, activeNoteIndex));
         }
     }
 
@@ -151,7 +150,7 @@ const Day = ({ weekIndex, weekId, dayIndex, dayServerIndex }) => {
 
     return (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
-            <p className={styles.text} onClick={openModal}>{date}, {day}{ notes.length ? `, ${notes.length} замет${strEnd()}` : '' }</p>
+            <p className={styles.text} onClick={openModal}>{date.split('-').reverse().slice(0, 2).join('.')}, {day}{ notes.length ? `, ${notes.length} замет${strEnd()}` : '' }</p>
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>

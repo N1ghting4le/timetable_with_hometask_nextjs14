@@ -4,34 +4,30 @@ import { API_URL, SERVER_URL } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
     return fetch(url, { method, headers, body, cache: 'no-store' })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
-                }
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
+            }
 
-                return res.json();
-            })
-            .catch(e => {
-                throw new Error(`Error while fetching ${url}: ${e.message}`);
-            });
+            return res.json();
+        })
+        .catch(e => {
+            throw new Error(`Error while fetching ${url}: ${e.message}`);
+        });
 }
 
 export default async function getTimetable() {
     return new Promise((resolve, reject) => {
-        Promise.all([request(API_URL), request(`${SERVER_URL}/weekList`)])
-                .then(values => resolve(parseTimetable(...values)))
-                .catch(error => reject(error));
+        Promise.all([request(API_URL), request(`${SERVER_URL}/days`)])
+            .then(values => resolve(parseTimetable(...values)))
+            .catch(error => reject(error));
     });
 }
 
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
           schedules = response.schedules || response.currentSchedules?.schedules || response.previousSchedules,
-          date = new Date(),
-          currDate = date.getDate(),
-          currMonth = date.getMonth(),
-          currYear = date.getFullYear(),
-          dateStr = `${currDate < 10 ? `0${currDate}` : currDate}.${currMonth + 1 < 10 ? `0${currMonth + 1}` : currMonth + 1}.${currYear}`,
+          dateStr = new Date().toJSON().slice(0, 10),
           exclusions = ['Консультация', 'Экзамен'];
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
 
@@ -70,21 +66,18 @@ const parseTimetable = (response, listOfWeeks) => {
     });
 
     const weekList = listOfWeeks.map((item, i) => ({
-        ...item,
-        days: item.days.map((day, index) => {
+        days: item.map((day, index) => {
             if (day.date === dateStr) {
                 currWeekIndex = i;
             }
 
-            if (day.day === 'Воскресенье') return null;
-
-            const dayDate = getTime(day.date),
-                  weekNum = item.id % 4 || 4,
-                  [{subjects: fullDayTimetable}] = timetable.filter(unit => unit.name === day.day);
+            const dayDate = new Date(day.date).getTime(),
+                    weekNum = (i + 1) % 4 || 4,
+                    [{subjects: fullDayTimetable}] = timetable.filter(unit => unit.name === day.name);
 
             const subjects = fullDayTimetable.filter(subj => {
                 const subjStartDate = getTime(subj.startLessonDate),
-                      subjEndDate = getTime(subj.endLessonDate);
+                        subjEndDate = getTime(subj.endLessonDate);
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
             }).map(subj => {
@@ -103,8 +96,8 @@ const parseTimetable = (response, listOfWeeks) => {
             });
 
             return {
-                date: day.date.substring(0, day.date.lastIndexOf('.')),
-                day: day.day,
+                date: day.date,
+                day: day.name,
                 dayNum: index + 1,
                 notes: day.notes,
                 hometasks: day.hometasks,

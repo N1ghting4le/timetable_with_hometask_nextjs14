@@ -7,7 +7,7 @@ import styles from "./week.module.css";
 
 const Week = ({ weekIndex }) => {
     const { curr, prevCurr } = useCurr();
-    const { days, id } = useWeek(weekIndex);
+    const { days } = useWeek(weekIndex);
     const isDesktop = useIsDesktop();
     const [display, setDisplay] = useState(curr === weekIndex);
     const [side, setSide] = useState(null);
@@ -32,8 +32,6 @@ const Week = ({ weekIndex }) => {
     const renderDays = () => days.map((item, i) => (
         <Day key={item.date}
              weekIndex={weekIndex}
-             weekId={id}
-             dayServerIndex={item.dayNum} 
              dayIndex={i}/>
     ));
 
