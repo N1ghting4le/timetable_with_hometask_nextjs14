@@ -11,12 +11,13 @@ import { useSubgroup, useSubject } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, day }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, 
         htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
+    const { id, text: htText } = hometask;
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
     const [open, setOpen] = useState(false);
@@ -50,7 +51,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, day }) => 
     const sendHometask = () => {
         const text = document.querySelector('#hometaskInput').value;
 
-        if (hometask === text) return closeModal();
+        if (htText === text) return closeModal();
 
         const send = (method, body, modifier, ...args) => {
             request(url, method, JSON.stringify(body))
@@ -63,24 +64,24 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, day }) => 
 
         setProcess('sending');
 
-        if (hometask) {
+        if (htText) {
             const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
 
             if (text) {
-                const body = { id: htId, day, subject: subjShort, type, teacher, text };
+                const body = { date, index: htIndex + 1, ...hometask, text, teacher };
 
-                send("POST", body, editHometask, newHtList, weekIndex, dayIndex);
+                send("PATCH", body, editHometask, newHtList, weekIndex, dayIndex);
             } else {
-                send("DELETE", { id: htId }, deleteHometask, newHtList, htIndex, weekIndex, dayIndex);
+                send("DELETE", { date, ...hometask }, deleteHometask, newHtList, htIndex, weekIndex, dayIndex);
             }
         } else {
-            const body = { id: uuid(), day, subject: subjShort, type, teacher, text };
+            const body = { date, subject: subjShort, type, text, teacher, id: uuid() };
 
             send("POST", body, addHometask, body, weekIndex, dayIndex, subjectIndex);
         }
     }
 
-    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', hometask);
+    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', htText);
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
@@ -96,7 +97,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, htId, day }) => 
                             <p>{subjShort} ({type})</p>
                             { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
                         </div>
-                        { hometask ? <p className={styles.htText}>{hometask}</p> : null}
+                        { htText ? <p className={styles.htText}>{htText}</p> : null}
                     </div>
                 </div>
                 {

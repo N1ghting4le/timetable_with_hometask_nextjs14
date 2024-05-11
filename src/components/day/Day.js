@@ -52,24 +52,19 @@ const Day = ({ weekIndex, dayIndex }) => {
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const url = `${SERVER_URL}/notes`;
-    const dateObj = new Date(date);
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
 
-    const renderSubjects = () => subjects.map((s, j) => {
-        const text = hometasks[s.htIndex]?.text;
-        const id = hometasks[s.htIndex]?.id;
-
-        return <Subject key={j}
-                        weekIndex={weekIndex}
-                        dayIndex={dayIndex}
-                        subjectIndex={j}
-                        hometask={text || ''}
-                        htId={id}
-                        day={dateObj}/>;
-    });
+    const renderSubjects = () => subjects.map((s, j) => (
+        <Subject key={j}
+                 weekIndex={weekIndex}
+                 dayIndex={dayIndex}
+                 subjectIndex={j}
+                 hometask={hometasks[s.htIndex] || {}}
+                 date={date}/>
+    ));
 
     const renderNotes = () => notes.length ? 
     notes.map((note, i) => {
@@ -111,16 +106,16 @@ const Day = ({ weekIndex, dayIndex }) => {
 
         if (!activeNote) {
             const body = {
+                date,
                 id: uuid(),
-                day: dateObj,
                 text
             };
 
             send("POST", body, [...notes, body]);
         } else if (toDelete) {
-            send("DELETE", { id: activeNote.id }, deleteNote(weekIndex, dayIndex, activeNoteIndex));
+            send("DELETE", { date, ...activeNote }, deleteNote(weekIndex, dayIndex, activeNoteIndex));
         } else {
-            send("POST", {...activeNote, text, day: dateObj}, editNote(text, weekIndex, dayIndex, activeNoteIndex));
+            send("PATCH", { date, index: activeNoteIndex + 1, ...activeNote, text }, editNote(text, weekIndex, dayIndex, activeNoteIndex));
         }
     }
 

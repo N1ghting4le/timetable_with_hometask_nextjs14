@@ -2,8 +2,8 @@
 
 import { API_URL, SERVER_URL } from "@/env/env";
 
-export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
-    return fetch(url, { method, headers, body, cache: 'no-store' })
+export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => (
+    fetch(url, { method, headers, body, cache: 'no-store' })
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
@@ -12,9 +12,9 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
             return res.json();
         })
         .catch(e => {
-            throw new Error(`Error while fetching ${url}: ${e.message}`);
-        });
-}
+            throw new Error(e.message);
+        })
+);
 
 export default async function getTimetable() {
     return new Promise((resolve, reject) => {
@@ -70,6 +70,8 @@ const parseTimetable = (response, listOfWeeks) => {
             if (day.date === dateStr) {
                 currWeekIndex = i;
             }
+
+            if (day.name === "Воскресенье") return null;
 
             const dayDate = new Date(day.date).getTime(),
                     weekNum = (i + 1) % 4 || 4,
