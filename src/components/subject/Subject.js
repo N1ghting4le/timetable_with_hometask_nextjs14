@@ -17,7 +17,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
         htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
-    const { id, text: htText } = hometask;
+    const { text: htText } = hometask;
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
     const [open, setOpen] = useState(false);
