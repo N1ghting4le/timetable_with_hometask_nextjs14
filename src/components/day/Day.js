@@ -47,7 +47,7 @@ const View2 = ({ elements, closeModal, activeNoteIndex, sendNote }) => (
 );
 
 const Day = ({ weekIndex, dayIndex }) => {
-    const { date, day, subjects, notes, hometasks, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
+    const { date, day, subjects, notes, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const [open, setOpen] = useState(0);
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
@@ -57,12 +57,11 @@ const Day = ({ weekIndex, dayIndex }) => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
 
-    const renderSubjects = () => subjects.map((s, j) => (
+    const renderSubjects = () => subjects.map((_, j) => (
         <Subject key={j}
                  weekIndex={weekIndex}
                  dayIndex={dayIndex}
                  subjectIndex={j}
-                 hometask={hometasks[s.htIndex] || {}}
                  date={date}/>
     ));
 
@@ -89,9 +88,7 @@ const Day = ({ weekIndex, dayIndex }) => {
         const text = document.querySelector("#noteInput").value;
         const activeNote = notes[activeNoteIndex];
 
-        if ((text === activeNote?.text && !toDelete) || !text) {
-            return closeModal(1);
-        }
+        if ((text === activeNote?.text && !toDelete) || !text) return closeModal(1);
 
         const send = (method, body, newNoteList) => {
             request(url, method, JSON.stringify(body))

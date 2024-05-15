@@ -11,15 +11,15 @@ import { useSubgroup, useSubject } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const { 
-        auditories, start, end, numSubgroup, subject, subjShort, type, note, weeks, employees, 
-        htIndex, addHometask, editHometask, deleteHometask, getEditedHtList
+        auditories, start, end, numSubgroup, subject, subjShort,
+        type, note, weeks, employees, hometask
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
-    const { text: htText } = hometask;
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
+    const [ht, setHt] = useState(hometask);
     const [open, setOpen] = useState(false);
     const [process, setProcess] = useState('idle');
     const auditory = auditories[0];
@@ -50,13 +50,14 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
 
     const sendHometask = () => {
         const text = document.querySelector('#hometaskInput').value;
+        const htText = ht?.text;
 
-        if (htText === text) return closeModal();
+        if (htText == text) return closeModal();
 
-        const send = (method, body, modifier, ...args) => {
+        const send = (method, body, newHt) => {
             request(url, method, JSON.stringify(body))
                 .then(() => {
-                    modifier(...args);
+                    setHt(newHt);
                     closeModal(true);
                 })
                 .catch(() => setProcess('error'));
@@ -64,24 +65,20 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
 
         setProcess('sending');
 
-        if (htText) {
-            const newHtList = getEditedHtList(weekIndex, dayIndex, htIndex, text);
+        if (htText && text) {
+            const body = { date, oldHometask: ht, newHometask: { ...ht, text, teacher } };
 
-            if (text) {
-                const body = { date, index: htIndex + 1, ...hometask, text, teacher };
-
-                send("PATCH", body, editHometask, newHtList, weekIndex, dayIndex);
-            } else {
-                send("DELETE", { date, ...hometask }, deleteHometask, newHtList, htIndex, weekIndex, dayIndex);
-            }
+            send("PATCH", body, body.newHometask);
+        } else if (htText) {
+            send("DELETE", { date, hometask: ht }, null);
         } else {
-            const body = { date, subject: subjShort, type, text, teacher, id: uuid() };
+            const body = { date, hometask: { subject: subjShort, type, text, teacher, id: uuid() } };
 
-            send("POST", body, addHometask, body, weekIndex, dayIndex, subjectIndex);
+            send("POST", body, body.hometask);
         }
     }
 
-    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', htText);
+    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', ht?.text);
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
@@ -97,7 +94,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, hometask, date }) => {
                             <p>{subjShort} ({type})</p>
                             { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
                         </div>
-                        { htText ? <p className={styles.htText}>{htText}</p> : null}
+                        { ht ? <p className={styles.htText}>{ht.text}</p> : null}
                     </div>
                 </div>
                 {

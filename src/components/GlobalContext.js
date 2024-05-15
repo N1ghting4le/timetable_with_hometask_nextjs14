@@ -17,14 +17,14 @@ const GlobalContext = ({ children }) => {
 
     useLayoutEffect(() => {
         getTimetable()
-        .then(res => {
-            const { weekList, currWeekIndex: curr } = res;
+            .then(res => {
+                const { weekList, currWeekIndex: curr } = res;
 
-            setGlobalState(state => ({...state, weekList, curr, prevCurr: curr}));
-        })
-        .catch(err => {
-            console.error(err);
-        });
+                setGlobalState(state => ({...state, weekList, curr, prevCurr: curr}));
+            })
+            .catch(err => {
+                console.error(err);
+            });
 
         const md = new MobileDetect(navigator.userAgent);
 
@@ -44,52 +44,6 @@ const GlobalContext = ({ children }) => {
 
         setCurr(curr) {
             setGlobalState(state => ({...state, prevCurr: state.curr, curr}));
-        },
-
-        getEditedHtList(weekIndex, dayIndex, htIndex, text) {
-            const { hometasks } = globalState.weekList[weekIndex].days[dayIndex];
-
-            return text ?
-            hometasks.map((ht, i) => i === htIndex ? ({...ht, text}) : ht) :
-            hometasks.filter((_, i) => i !== htIndex);
-        },
-
-        addHometask(hometask, weekIndex, dayIndex, subjIndex) {
-            const weekList = globalState.weekList,
-                  { subjects, hometasks } = globalState.weekList[weekIndex].days[dayIndex],
-                  subject = subjects[subjIndex];
-
-            subject.htIndex = hometasks.push(hometask) - 1;
-            setGlobalState(state => ({...state, weekList}));
-        },
-
-        editHometask(htList, weekIndex, dayIndex) {
-            const weekList = globalState.weekList;
-
-            weekList[weekIndex].days[dayIndex].hometasks = htList;
-            setGlobalState(state => ({...state, weekList}));
-        },
-
-        deleteHometask(htList, htIndex, weekIndex, dayIndex) {
-            const weekList = globalState.weekList,
-                  day = weekList[weekIndex].days[dayIndex];
-
-            day.hometasks = htList;
-
-            day.subjects.forEach(item => {
-                if (item.htIndex < 0) return;
-
-                if (item.htIndex === htIndex) {
-                    item.htIndex = -1;
-                    return;
-                }
-
-                if (item.htIndex > htIndex) {
-                    item.htIndex--;
-                }
-            });
-
-            setGlobalState(state => ({...state, weekList}));
         },
 
         setNotes(newNoteList, weekIndex, dayIndex) {
@@ -131,17 +85,11 @@ const useDay = (weekIndex, dayIndex) => {
     return { ...day, setNotes, editNote, deleteNote };
 }
 
-const useSubject = (weekIndex, dayIndex, subjectIndex) => {
-    const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
-          context = useContext(Context),
-          { addHometask, editHometask, deleteHometask, getEditedHtList } = context;
-
-    return { ...subject, addHometask, editHometask, deleteHometask, getEditedHtList };
-}
+const useSubject = (weekIndex, dayIndex, subjectIndex) => useDay(weekIndex, dayIndex).subjects[subjectIndex];
 
 const useCurr = () => {
     const context = useContext(Context),
-          { curr, prevCurr, setCurr } = context;          
+          { curr, prevCurr, setCurr } = context;
 
     return { curr, prevCurr, setCurr };
 }

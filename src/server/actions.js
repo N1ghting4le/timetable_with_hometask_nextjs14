@@ -83,17 +83,17 @@ const parseTimetable = (response, listOfWeeks) => {
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
             }).map(subj => {
-                let htIndex = -1;
+                let hometask = null;
 
-                day.hometasks.forEach((task, i) => {
+                day.hometasks.forEach(task => {
                     if (task.subject === subj.subjShort && (task.subject === 'ИнЯз' ? JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]) : true) && task.type === subj.type) {
-                        htIndex = i;
+                        hometask = task;
                     }
                 });
 
                 return {
                     ...subj,
-                    htIndex
+                    hometask
                 };
             });
 
@@ -102,7 +102,6 @@ const parseTimetable = (response, listOfWeeks) => {
                 day: day.name,
                 dayNum: index + 1,
                 notes: day.notes,
-                hometasks: day.hometasks,
                 subjects
             };
         }).filter(day => day && day.subjects.length)
