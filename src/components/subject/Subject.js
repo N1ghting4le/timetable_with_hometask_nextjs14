@@ -14,12 +14,11 @@ import styles from "./subject.module.css";
 const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort,
-        type, note, weeks, employees, hometask
+        type, note, weeks, employees, hometask, setHometask
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
-    const [ht, setHt] = useState(hometask);
     const [open, setOpen] = useState(false);
     const [process, setProcess] = useState('idle');
     const auditory = auditories[0];
@@ -50,14 +49,14 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
 
     const sendHometask = () => {
         const text = document.querySelector('#hometaskInput').value;
-        const htText = ht?.text;
+        const htText = hometask?.text;
 
         if (htText == text) return closeModal();
 
         const send = (method, body, newHt) => {
             request(url, method, JSON.stringify(body))
                 .then(() => {
-                    setHt(newHt);
+                    setHometask(weekIndex, dayIndex, subjectIndex, newHt);
                     closeModal(true);
                 })
                 .catch(() => setProcess('error'));
@@ -66,11 +65,11 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
         setProcess('sending');
 
         if (htText && text) {
-            const body = { date, oldHometask: ht, newHometask: { ...ht, text, teacher } };
+            const body = { date, oldHometask: hometask, newHometask: { ...hometask, text, teacher } };
 
             send("PATCH", body, body.newHometask);
         } else if (htText) {
-            send("DELETE", { date, hometask: ht }, null);
+            send("DELETE", { date, hometask: hometask }, null);
         } else {
             const body = { date, hometask: { subject: subjShort, type, text, teacher, id: uuid() } };
 
@@ -78,7 +77,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
         }
     }
 
-    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', ht?.text);
+    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', hometask?.text);
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
@@ -94,7 +93,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
                             <p>{subjShort} ({type})</p>
                             { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
                         </div>
-                        { ht ? <p className={styles.htText}>{ht.text}</p> : null}
+                        { hometask ? <p className={styles.htText}>{hometask.text}</p> : null}
                     </div>
                 </div>
                 {

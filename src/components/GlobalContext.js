@@ -61,6 +61,13 @@ const GlobalContext = ({ children }) => {
         editNote(text, weekIndex, dayIndex, noteIndex) {
             return globalState.weekList[weekIndex].days[dayIndex].notes
                     .map((note, i) => i === noteIndex ? ({...note, text}) : note);
+        },
+
+        setHometask(weekIndex, dayIndex, subjectIndex, newHometask) {
+            const weekList = globalState.weekList;
+
+            weekList[weekIndex].days[dayIndex].subjects[subjectIndex].hometask = newHometask;
+            setGlobalState(state => ({...state, weekList}));
         }
     }
 
@@ -85,7 +92,13 @@ const useDay = (weekIndex, dayIndex) => {
     return { ...day, setNotes, editNote, deleteNote };
 }
 
-const useSubject = (weekIndex, dayIndex, subjectIndex) => useDay(weekIndex, dayIndex).subjects[subjectIndex];
+const useSubject = (weekIndex, dayIndex, subjectIndex) => {
+    const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
+          context = useContext(Context),
+          { setHometask } = context;
+
+    return { ...subject, setHometask };
+}
 
 const useCurr = () => {
     const context = useContext(Context),
