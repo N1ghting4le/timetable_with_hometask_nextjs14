@@ -23,6 +23,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const [process, setProcess] = useState('idle');
     const auditory = auditories[0];
     const url = `${SERVER_URL}/hometasks`;
+    const inputId = "hometaskInput";
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -48,7 +49,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const startEntering = () => setProcess('entering');
 
     const sendHometask = () => {
-        const text = document.querySelector('#hometaskInput').value;
+        const text = document.querySelector(`#${inputId}`).value;
         const htText = hometask?.text;
 
         if (htText == text) return closeModal();
@@ -77,7 +78,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
         }
     }
 
-    const elements = renderElements("hometaskInput", styles.input, sendHometask, process, styles.error, process === 'idle', hometask?.text);
+    const elements = renderElements(inputId, styles.input, sendHometask, process, styles.error, process === 'idle', hometask?.text);
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>

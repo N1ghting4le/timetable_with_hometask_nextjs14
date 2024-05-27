@@ -52,6 +52,7 @@ const Day = ({ weekIndex, dayIndex }) => {
     const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const url = `${SERVER_URL}/notes`;
+    const inputId = "noteInput"
 
     useEffect(() => {
         document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
@@ -85,7 +86,7 @@ const Day = ({ weekIndex, dayIndex }) => {
     const sendNote = (toDelete = false) => {
         if (process === 'sending') return;
 
-        const text = document.querySelector("#noteInput").value;
+        const text = document.querySelector(`#${inputId}`).value;
         const activeNote = notes[activeNoteIndex];
 
         if ((text === activeNote?.text && !toDelete) || !text) return closeModal(1);
@@ -137,7 +138,7 @@ const Day = ({ weekIndex, dayIndex }) => {
 
     const subjectElems = renderSubjects();
     const noteElems = renderNotes();
-    const elements = renderElements("noteInput", styles.input, () => sendNote(), process, styles.error, open < 2, notes[activeNoteIndex]?.text);
+    const elements = renderElements(inputId, styles.input, () => sendNote(), process, styles.error, open < 2, notes[activeNoteIndex]?.text);
     const modal = renderModal(noteElems, elements);
 
     return (

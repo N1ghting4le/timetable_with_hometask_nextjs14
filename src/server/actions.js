@@ -11,9 +11,6 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
 
             return res.json();
         })
-        .catch(e => {
-            throw new Error(e.message);
-        })
 );
 
 export default async function getTimetable() {
