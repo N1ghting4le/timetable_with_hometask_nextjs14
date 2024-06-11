@@ -113,7 +113,7 @@ const Day = ({ weekIndex, dayIndex }) => {
         } else if (toDelete) {
             send("DELETE", { date, ...activeNote }, deleteNote(weekIndex, dayIndex, activeNoteIndex));
         } else {
-            send("PATCH", { date, index: activeNoteIndex + 1, ...activeNote, text }, editNote(text, weekIndex, dayIndex, activeNoteIndex));
+            send("PATCH", { date, oldNote: activeNote, newNote: { ...activeNote, text } }, editNote(text, weekIndex, dayIndex, activeNoteIndex));
         }
     }
 
