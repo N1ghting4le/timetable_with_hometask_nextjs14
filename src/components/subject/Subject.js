@@ -51,8 +51,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const sendHometask = () => {
         const text = document.querySelector(`#${inputId}`).value;
         const htText = hometask?.text;
-
-        if (htText == text) return closeModal();
+        
+        if (htText === text || (!htText && !text)) return closeModal();
 
         const send = (method, body, newHt) => {
             request(url, method, JSON.stringify(body))
@@ -70,7 +70,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
 
             send("PATCH", body, body.newHometask);
         } else if (htText) {
-            send("DELETE", { date, hometask: hometask }, null);
+            send("DELETE", { date, hometask }, null);
         } else {
             const body = { date, hometask: { subject: subjShort, type, text, teacher, id: uuid() } };
 
