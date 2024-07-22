@@ -61,18 +61,8 @@
 }
 
 .input {
-    border-radius: 5px;
     min-height: 250px;
     max-height: 500px;
-    max-width: 100%;
-    min-width: 100%;
-    font-family: inherit;
-    padding: 2px;
-    font-size: 1rem;
-}
-
-.error {
-    color: red;
 }
 
 .rubbishBin {

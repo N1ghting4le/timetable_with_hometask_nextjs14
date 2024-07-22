@@ -4,13 +4,13 @@ import { SERVER_URL } from "@/env/env";
 import Modal from "../modal/Modal";
 import Subject from "../subject/Subject";
 import Note from "../Note/Note";
-import Btn from "../Btn/Btn";
+import Btn from "../btn/Btn";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { request } from "@/server/actions";
+import useQuery from "@/hooks/query.hook";
 import { useDay } from "../GlobalContext";
 import styles from "./day.module.css";
-import { renderElements } from "@/commonFunctions";
+import Form from "../form/Form";
 import { v4 as uuid } from 'uuid';
 
 const View1 = ({ noteElems, setOpen }) => (
@@ -22,34 +22,38 @@ const View1 = ({ noteElems, setOpen }) => (
     </>
 );
 
-const View2 = ({ elements, closeModal, activeNoteIndex, sendNote }) => (
-    <>
-        <Image src="https://img.icons8.com/windows/32/return.png" 
-                alt="return arrow" 
-                width={25} 
-                height={25}
-                className={styles.backArrow}
-                onClick={() => closeModal(1)}/>
-        { 
-            activeNoteIndex >= 0 ?
-            <>
-                <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
-                <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
-                        alt="rubbish bin icon" 
-                        width={30} 
-                        height={30} 
-                        className={styles.rubbishBin} 
-                        onClick={() => sendNote(true)}/>
-            </> : <h2>Новая заметка</h2> 
-        }
-        {elements}
-    </>
-);
+const View2 = ({ closeModal, activeNoteIndex, sendNote, formProps }) => {
+    const { id, className, onSubmit, process, cond, text } = formProps;
+
+    return (
+        <>
+            <Image src="https://img.icons8.com/windows/32/return.png" 
+                    alt="return arrow" 
+                    width={25} 
+                    height={25}
+                    className={styles.backArrow}
+                    onClick={() => closeModal(1)}/>
+            { 
+                activeNoteIndex >= 0 ?
+                <>
+                    <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
+                    <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
+                            alt="rubbish bin icon" 
+                            width={30} 
+                            height={30} 
+                            className={styles.rubbishBin} 
+                            onClick={() => sendNote(true)}/>
+                </> : <h2>Новая заметка</h2> 
+            }
+            <Form id={id} className={className} onSubmit={onSubmit} process={process} cond={cond} text={text}/>
+        </>
+    );
+}
 
 const Day = ({ weekIndex, dayIndex }) => {
     const { date, day, subjects, notes, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
+    const { queryState, query, resetQueryState } = useQuery();
     const [open, setOpen] = useState(0);
-    const [process, setProcess] = useState('idle');
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const url = `${SERVER_URL}/notes`;
     const inputId = "noteInput"
@@ -63,64 +67,56 @@ const Day = ({ weekIndex, dayIndex }) => {
                  weekIndex={weekIndex}
                  dayIndex={dayIndex}
                  subjectIndex={j}
-                 date={date}/>
+                 dayDate={date}/>
     ));
 
     const renderNotes = () => notes.length ? 
-    notes.map((note, i) => {
-        const { id, text } = note;
+        notes.map((note, i) => {
+            const { id, text } = note;
 
-        return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
-    }) : <h2>Нет заметок</h2>;
+            return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
+        }) : <h2>Нет заметок</h2>;
 
     const openModal = () => setOpen(1);
     
-    const closeModal = (num = 0, success = false) => {
-        if (!success && process === 'sending') return;
+    const closeModal = (num = 0) => {
+        if (queryState === 'pending') return;
 
         setOpen(num);
         setActiveNoteIndex(-1);
-        setProcess('idle');
+        resetQueryState();
     }
 
     const sendNote = (toDelete = false) => {
-        if (process === 'sending') return;
-
         const text = document.querySelector(`#${inputId}`).value;
         const activeNote = notes[activeNoteIndex];
 
         if ((text === activeNote?.text && !toDelete) || !text) return closeModal(1);
 
-        const send = (method, body, newNoteList) => {
-            request(url, method, JSON.stringify(body))
-            .then(() => {
-                setNotes(newNoteList, weekIndex, dayIndex);
-                closeModal(1, true);
-            })
-            .catch(() => setProcess('error'));
+        const send = async (method, body, newNoteList) => {
+            query(url, method, JSON.stringify(body))
+                .then(() => {
+                    setNotes(newNoteList, weekIndex, dayIndex);
+                    closeModal(1);
+                });
         }
 
-        setProcess('sending');
-
         if (!activeNote) {
-            const body = {
-                date,
-                id: uuid(),
-                text
-            };
+            const body = { id: uuid(), date, text };
+            const { date: toDelete, ...newNote } = body;
 
-            send("POST", body, [...notes, body]);
+            send("POST", body, [...notes, newNote]);
         } else if (toDelete) {
-            send("DELETE", { date, ...activeNote }, deleteNote(weekIndex, dayIndex, activeNoteIndex));
+            send("DELETE", { id: activeNote.id }, deleteNote(notes, activeNoteIndex));
         } else {
-            send("PATCH", { date, oldNote: activeNote, newNote: { ...activeNote, text } }, editNote(text, weekIndex, dayIndex, activeNoteIndex));
+            send("PATCH", { id: activeNote.id, text }, editNote(notes, activeNoteIndex, text));
         }
     }
 
-    const renderModal = (noteElems, elements) => {
+    const renderModalContent = (noteElems, formProps) => {
         switch (open) {
             case 1: return <View1 noteElems={noteElems} setOpen={setOpen}/>;
-            case 2: return <View2 elements={elements} closeModal={closeModal} activeNoteIndex={activeNoteIndex} sendNote={sendNote}/>;
+            case 2: return <View2 closeModal={closeModal} activeNoteIndex={activeNoteIndex} sendNote={sendNote} formProps={formProps}/>;
             default: return null;
         }
     }
@@ -138,17 +134,23 @@ const Day = ({ weekIndex, dayIndex }) => {
 
     const subjectElems = renderSubjects();
     const noteElems = renderNotes();
-    const elements = renderElements(inputId, styles.input, () => sendNote(), process, styles.error, open < 2, notes[activeNoteIndex]?.text);
-    const modal = renderModal(noteElems, elements);
+    const modalContent = renderModalContent(noteElems, {
+        id: inputId,
+        className: styles.input,
+        onSubmit: () => sendNote(),
+        process: queryState,
+        cond: open < 2,
+        text: notes[activeNoteIndex]?.text
+    });
 
     return (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
-            <p className={styles.text} onClick={openModal}>{date.split('-').reverse().slice(0, 2).join('.')}, {day}{ notes.length ? `, ${notes.length} замет${strEnd()}` : '' }</p>
+            <p className={styles.text} onClick={openModal}>{date.split('-').reverse().slice(0, 2).join('.')}, {day}{notes.length ? `, ${notes.length} замет${strEnd()}` : ''}</p>
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>
             <Modal open={!!open} onClose={() => closeModal()} style={open === 1 ? { paddingTop: "30px" } : null}>
-                {modal}
+                {modalContent}
             </Modal>
         </div>
     );

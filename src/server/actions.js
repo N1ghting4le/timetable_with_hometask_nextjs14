@@ -2,16 +2,15 @@
 
 import { API_URL, SERVER_URL } from "@/env/env";
 
-export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => (
-    fetch(url, { method, headers, body, cache: 'no-store' })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
-            }
+export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
+    const res = await fetch(url, { method, headers, body, cache: 'no-store' });
 
-            return res.json();
-        })
-);
+    if (!res.ok) {
+        throw new Error(`Failed to fetch ${url}, status: ${res.statusText}`);
+    } 
+    
+    return await res.json();
+}
 
 export default async function getTimetable() {
     return new Promise((resolve, reject) => {
@@ -64,35 +63,21 @@ const parseTimetable = (response, listOfWeeks) => {
 
     const weekList = listOfWeeks.map((item, i) => ({
         days: item.map((day, index) => {
-            if (day.date === dateStr) {
-                currWeekIndex = i;
-            }
-
-            if (day.name === "Воскресенье") return null;
+            if (day.date === dateStr) currWeekIndex = i;
 
             const dayDate = new Date(day.date).getTime(),
-                    weekNum = (i + 1) % 4 || 4,
-                    [{subjects: fullDayTimetable}] = timetable.filter(unit => unit.name === day.name);
+                    weekNum = i % 4 + 1,
+                    fullDayTimetable = timetable.find(unit => unit.name === day.name).subjects;
 
             const subjects = fullDayTimetable.filter(subj => {
                 const subjStartDate = getTime(subj.startLessonDate),
                         subjEndDate = getTime(subj.endLessonDate);
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
-            }).map(subj => {
-                let hometask = null;
-
-                day.hometasks.forEach(task => {
-                    if (task.subject === subj.subjShort && (task.subject === 'ИнЯз' ? JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]) : true) && task.type === subj.type) {
-                        hometask = task;
-                    }
-                });
-
-                return {
-                    ...subj,
-                    hometask
-                };
-            });
+            }).map(subj => ({
+                ...subj,
+                hometask: day.hometasks.find(task => task.subject === subj.subjShort && task.type === subj.type && (task.subject !== 'ИнЯз' || JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]))) || null
+            }));
 
             return {
                 date: day.date,
@@ -101,23 +86,24 @@ const parseTimetable = (response, listOfWeeks) => {
                 notes: day.notes,
                 subjects
             };
-        }).filter(day => day && day.subjects.length)
+        }).filter(day => day.subjects.length)
     })).filter((item, i) => {
-        if (!item.days.length && firstEmptyWeek < 0) {
-            lastEmptyWeek = firstEmptyWeek = i;
-        } else if (!item.days.length) {
+        if (!item.days.length) {
+            if (firstEmptyWeek < 0) firstEmptyWeek = i;
+
             lastEmptyWeek = i;
         }
 
         return item.days.length;
     });
     
-    return {
-        weekList,
-        currWeekIndex: currWeekIndex >= firstEmptyWeek && firstEmptyWeek >= 0 ? 
-        currWeekIndex <= lastEmptyWeek ? 
-        firstEmptyWeek > 0 ? firstEmptyWeek - 1 : 0 
-        : currWeekIndex + firstEmptyWeek - lastEmptyWeek - 1 
-        : currWeekIndex
+    if (currWeekIndex >= firstEmptyWeek && firstEmptyWeek >= 0) {
+        if (currWeekIndex <= lastEmptyWeek) {
+            currWeekIndex = Math.max(firstEmptyWeek - 1, 0);
+        } else {
+            currWeekIndex += firstEmptyWeek - lastEmptyWeek - 1;
+        }
     }
+
+    return { weekList, currWeekIndex };
 }

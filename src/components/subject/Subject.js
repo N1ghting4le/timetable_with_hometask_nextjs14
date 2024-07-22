@@ -2,16 +2,16 @@
 
 import Modal from "../modal/Modal";
 import Image from "next/image";
-import Btn from "@/components/Btn/Btn";
+import Btn from "@/components/btn/Btn";
 import { useState, useEffect } from "react";
+import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
-import { request } from "@/server/actions";
-import { renderElements } from "@/commonFunctions";
+import Form from "../form/Form";
 import { useSubgroup, useSubject } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
+const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort,
         type, note, weeks, employees, hometask, setHometask
@@ -20,7 +20,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
     const [open, setOpen] = useState(false);
-    const [process, setProcess] = useState('idle');
+    const [showForm, setShowForm] = useState(false);
+    const { queryState, query, resetQueryState } = useQuery();
     const auditory = auditories[0];
     const url = `${SERVER_URL}/hometasks`;
     const inputId = "hometaskInput";
@@ -31,11 +32,11 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
 
     const openModal = () => setOpen(true);
     
-    const closeModal = (success = false) => {
-        if (process === 'sending' && !success) return;
+    const closeModal = () => {
+        if (queryState === 'pending') return;
 
         setOpen(false);
-        setProcess('idle');
+        resetQueryState();
     }
 
     const color = () => {
@@ -46,39 +47,33 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
         }
     }
 
-    const startEntering = () => setProcess('entering');
-
     const sendHometask = () => {
         const text = document.querySelector(`#${inputId}`).value;
         const htText = hometask?.text;
         
         if (htText === text || (!htText && !text)) return closeModal();
 
-        const send = (method, body, newHt) => {
-            request(url, method, JSON.stringify(body))
+        const send = async (method, body, newHt) => {
+            query(url, method, JSON.stringify(body))
                 .then(() => {
                     setHometask(weekIndex, dayIndex, subjectIndex, newHt);
-                    closeModal(true);
-                })
-                .catch(() => setProcess('error'));
+                    closeModal();
+                });
         }
-
-        setProcess('sending');
 
         if (htText && text) {
-            const body = { date, oldHometask: hometask, newHometask: { ...hometask, text, teacher } };
+            const body = { id: hometask.id, teacher, text };
 
-            send("PATCH", body, body.newHometask);
+            send("PATCH", body, { ...hometask, teacher, text });
         } else if (htText) {
-            send("DELETE", { date, hometask }, null);
+            send("DELETE", { id: hometask.id }, null);
         } else {
-            const body = { date, hometask: { subject: subjShort, type, text, teacher, id: uuid() } };
+            const body = { id: uuid(), date: dayDate, subject: subjShort, type, teacher, text };
+            const { date, ...newHt } = body;
 
-            send("POST", body, body.hometask);
+            send("POST", body, newHt);
         }
     }
-
-    const elements = renderElements(inputId, styles.input, sendHometask, process, styles.error, process === 'idle', hometask?.text);
 
     return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
         <li className={styles.wrapper}>
@@ -107,7 +102,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
             </div>
             <Modal open={open} onClose={closeModal}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
-                <Image width={180} height={180} src={photoLink ? photoLink : PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
+                <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
                 <div className={styles.timetable}>
                     <div className={styles.timetableColumn}>
@@ -120,8 +115,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, date }) => {
                         <span className={styles.timetableItem}>{subgroup ? `подгр. ${subgroup}` : ''}</span>
                     </div>
                 </div>
-                {subjShort !== 'ФизК' ? <Btn onClick={startEntering}>Д/З</Btn> : null}
-                {elements}
+                {subjShort !== 'ФизК' ? <Btn onClick={() => setShowForm(!showForm)}>Д/З</Btn> : null}
+                <Form id={inputId} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
             </Modal>
         </li>
     ) : null;

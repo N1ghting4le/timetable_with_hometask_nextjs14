@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useLayoutEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import MobileDetect from "mobile-detect";
 import getTimetable from '@/server/actions';
 
@@ -15,7 +15,7 @@ const GlobalContext = ({ children }) => {
         isDesktop: false
     });
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         getTimetable()
             .then(res => {
                 const { weekList, currWeekIndex: curr } = res;
@@ -53,14 +53,12 @@ const GlobalContext = ({ children }) => {
             setGlobalState(state => ({...state, weekList}));
         },
 
-        deleteNote(weekIndex, dayIndex, noteIndex) {
-            return globalState.weekList[weekIndex].days[dayIndex].notes
-                    .filter((_, i) => i !== noteIndex);
+        deleteNote(notes, noteIndex) {
+            return notes.filter((_, i) => i !== noteIndex);
         },
 
-        editNote(text, weekIndex, dayIndex, noteIndex) {
-            return globalState.weekList[weekIndex].days[dayIndex].notes
-                    .map((note, i) => i === noteIndex ? ({...note, text}) : note);
+        editNote(notes, noteIndex, text) {
+            return notes.map((note, i) => i === noteIndex ? ({...note, text}) : note);
         },
 
         setHometask(weekIndex, dayIndex, subjectIndex, newHometask) {

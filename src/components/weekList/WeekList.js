@@ -10,8 +10,7 @@ const WeekList = () => {
     const weekList = useWeekList();
 
     const renderWeeks = () => weekList.length ? 
-    weekList.map((_, i) => <Week key={i} weekIndex={i}/>) : 
-    <Loading/>;
+        weekList.map((_, i) => <Week key={i} weekIndex={i}/>) : <Loading/>;
 
     const elements = renderWeeks();
     

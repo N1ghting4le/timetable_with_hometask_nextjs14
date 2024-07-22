@@ -76,7 +76,6 @@
 
 .htText {
     margin-top: 10px;
-    /* text-align: justify; */
 }
 
 .time {
@@ -86,23 +85,6 @@
 .timetableItem {
     font-size: 0.9rem;
     color: rgb(104, 104, 104);
-}
-
-.error {
-    color: red;
-}
-
-.input {
-    border-radius: 5px;
-    height: 100px;
-    width: 100%;
-    max-height: 200px;
-    max-width: 100%;
-    min-width: 100%;
-    min-height: 100px;
-    font-family: inherit;
-    padding: 2px;
-    font-size: 1rem;
 }
 
 @media (max-width: 576px) {
@@ -121,10 +103,6 @@
 
     .time {
         min-width: 40px;
-    }
-
-    .input {
-        max-height: 100px;
     }
 
     .text {

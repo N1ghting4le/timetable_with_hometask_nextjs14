@@ -1,0 +1,13 @@
+.input {
+    border-radius: 5px;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100px;
+    font-family: inherit;
+    padding: 2px;
+    font-size: 1rem;
+}
+
+.error {
+    color: red;
+}

@@ -17,8 +17,8 @@ const Week = ({ weekIndex }) => {
         if (curr === weekIndex) {
             setDisplay(true);
             setSide(() => {
-                if (prevCurr > weekIndex) return styles.fromLeft;
-                return prevCurr < weekIndex ? styles.fromRight : null;
+                if (prevCurr === weekIndex) return null;
+                return styles[prevCurr < weekIndex ? 'fromRight' : 'fromLeft'];
             });
         } else if (display) {
             if (!isDesktop) return setDisplay(false);
