@@ -4,78 +4,23 @@ import { SERVER_URL } from "@/env/env";
 import Modal from "../modal/Modal";
 import Subject from "../subject/Subject";
 import Note from "../Note/Note";
-import Btn from "../btn/Btn";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
-import { useDay } from "../GlobalContext";
+import { useDay, useGroupNum } from "../GlobalContext";
 import styles from "./day.module.css";
 import Form from "../form/Form";
 import { v4 as uuid } from 'uuid';
 
-const View1 = ({ noteElems, setOpen }) => (
-    <>
-        {noteElems}
-        <div className={styles.wrapper}>
-            <Btn className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</Btn>
-        </div>
-    </>
-);
-
-const View2 = ({ closeModal, activeNoteIndex, sendNote, formProps }) => {
-    const { id, className, onSubmit, process, cond, text } = formProps;
-
-    return (
-        <>
-            <Image src="https://img.icons8.com/windows/32/return.png" 
-                    alt="return arrow" 
-                    width={25} 
-                    height={25}
-                    className={styles.backArrow}
-                    onClick={() => closeModal(1)}/>
-            { 
-                activeNoteIndex >= 0 ?
-                <>
-                    <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
-                    <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
-                            alt="rubbish bin icon" 
-                            width={30} 
-                            height={30} 
-                            className={styles.rubbishBin} 
-                            onClick={() => sendNote(true)}/>
-                </> : <h2>Новая заметка</h2> 
-            }
-            <Form id={id} className={className} onSubmit={onSubmit} process={process} cond={cond} text={text}/>
-        </>
-    );
-}
-
 const Day = ({ weekIndex, dayIndex }) => {
     const { date, day, subjects, notes, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
     const { queryState, query, resetQueryState } = useQuery();
+    const groupNum = useGroupNum(); 
     const [open, setOpen] = useState(0);
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const url = `${SERVER_URL}/notes`;
-    const inputId = "noteInput"
-
-    useEffect(() => {
-        document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
-    }, [open]);
-
-    const renderSubjects = () => subjects.map((_, j) => (
-        <Subject key={j}
-                 weekIndex={weekIndex}
-                 dayIndex={dayIndex}
-                 subjectIndex={j}
-                 dayDate={date}/>
-    ));
-
-    const renderNotes = () => notes.length ? 
-        notes.map((note, i) => {
-            const { id, text } = note;
-
-            return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
-        }) : <h2>Нет заметок</h2>;
+    const inputId = "noteInput";
+    const modalStyle = { paddingInline: '30px', maxHeight: '90vh'};
 
     const openModal = () => setOpen(1);
     
@@ -102,8 +47,8 @@ const Day = ({ weekIndex, dayIndex }) => {
         }
 
         if (!activeNote) {
-            const body = { id: uuid(), date, text };
-            const { date: toDelete, ...newNote } = body;
+            const body = { id: uuid(), date, text, groupNum };
+            const { date: a, groupNum: b, ...newNote } = body;
 
             send("POST", body, [...notes, newNote]);
         } else if (toDelete) {
@@ -112,6 +57,16 @@ const Day = ({ weekIndex, dayIndex }) => {
             send("PATCH", { id: activeNote.id, text }, editNote(notes, activeNoteIndex, text));
         }
     }
+
+    const renderSubjects = () => subjects.map((_, j) => (
+        <Subject key={j} weekIndex={weekIndex} dayIndex={dayIndex} subjectIndex={j} dayDate={date}/>
+    ));
+
+    const renderNotes = () => notes.length ? notes.map((note, i) => {
+        const { id, text } = note;
+
+        return <Note key={id} i={i} text={text} setOpen={setOpen} setActiveNoteIndex={setActiveNoteIndex}/>;
+    }) : null;
 
     const renderModalContent = (noteElems, formProps) => {
         switch (open) {
@@ -149,10 +104,50 @@ const Day = ({ weekIndex, dayIndex }) => {
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>
-            <Modal open={!!open} onClose={() => closeModal()} style={open === 1 ? { paddingTop: "30px" } : null}>
+            <Modal open={!!open} onClose={() => closeModal()} style={modalStyle}>
                 {modalContent}
             </Modal>
         </div>
+    );
+}
+
+const View1 = ({ noteElems, setOpen }) => (
+    <>
+        {
+            noteElems ? 
+            <div className={styles.notes}>
+                {noteElems}
+            </div> : <h2>Нет заметок</h2>
+        }
+        <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
+    </>
+);
+
+const View2 = ({ closeModal, activeNoteIndex, sendNote, formProps }) => {
+    const { id, className, onSubmit, process, cond, text } = formProps;
+
+    return (
+        <>
+            <Image src="https://img.icons8.com/windows/32/return.png" 
+                    alt="return arrow" 
+                    width={25} 
+                    height={25}
+                    className={styles.backArrow}
+                    onClick={() => closeModal(1)}/>
+            { 
+                activeNoteIndex >= 0 ?
+                <>
+                    <h2>Заметка &#8470;{activeNoteIndex + 1}</h2>
+                    <Image src="https://img.icons8.com/color/48/full-bin-windows.png" 
+                            alt="rubbish bin icon" 
+                            width={30} 
+                            height={30} 
+                            className={styles.rubbishBin} 
+                            onClick={() => sendNote(true)}/>
+                </> : <h2>Новая заметка</h2> 
+            }
+            <Form id={id} className={className} onSubmit={onSubmit} process={process} cond={cond} text={text}/>
+        </>
     );
 }
 

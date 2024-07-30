@@ -14,19 +14,31 @@
 }
 
 .buttonStyle {
+    padding: 10px 15px;
+}
+
+.link {
+    display: grid;
+    place-items: center;
     background-color: #393E46;
-    color: #00ADB5;
-    font-weight: bold;
-    font-size: 20px;
-    padding: 10px 30px;
-    cursor: pointer;
+    height: 43.2px;
+    width: 43.2px;
+    border-radius: 5px;
     transition: all 0.2s ease-in-out;
 }
 
+.link:hover {
+    background-color: #303030;
+    box-shadow: 0 0 5px #303030;
+}
+
+.active {
+    background-color: #000;
+    pointer-events: none;
+}
+
 .arrow {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 10px 30px;
 }
 
 .prev {
@@ -39,16 +51,6 @@
     shape-outside: polygon(0% 0%, 92% 0%, 100% 50%, 92% 100%, 0% 100%, 6% 50%);
 }
 
-.subgrButt {
-    border-radius: 5px;
-    border: 0;
-}
-
-.buttonStyle:hover {
-    background-color: #303030;
-    transition: all 0.2s ease-in-out;
-}
-
 @media (max-width: 576px) {
     .buttons {
         justify-content: center;
@@ -59,6 +61,7 @@
     .buttonStyle {
         font-size: 14px;
         white-space: nowrap;
+        padding: 10px 5px;
     }
 
     .wrapper {
@@ -74,5 +77,10 @@
 
     .arrow {
         padding-inline: 20px;
+    }
+
+    .link {
+        width: 36.8px;
+        height: 36.8px;
     }
 }

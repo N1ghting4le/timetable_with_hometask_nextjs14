@@ -1,15 +1,10 @@
-import GlobalContext from '@/components/GlobalContext';
-import WeekList from '@/components/weekList/WeekList';
 import styles from './page.module.css';
-
-export const dynamic = "force-dynamic";
+import GroupsForm from '@/components/groupsForm/GroupsForm';
 
 export default async function Home() {
   return (
     <main className={styles.main}>
-      <GlobalContext>
-        <WeekList/>
-      </GlobalContext>
+      <GroupsForm/>
     </main>
   );
 }

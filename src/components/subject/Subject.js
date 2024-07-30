@@ -2,12 +2,11 @@
 
 import Modal from "../modal/Modal";
 import Image from "next/image";
-import Btn from "@/components/btn/Btn";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
-import { useSubgroup, useSubject } from "../GlobalContext";
+import { useSubgroup, useSubject, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 
@@ -17,6 +16,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
         type, note, weeks, employees, hometask, setHometask
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
+    const groupNum = useGroupNum();
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
     const [open, setOpen] = useState(false);
@@ -25,10 +25,6 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
     const auditory = auditories[0];
     const url = `${SERVER_URL}/hometasks`;
     const inputId = "hometaskInput";
-
-    useEffect(() => {
-        document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
-    }, [open]);
 
     const openModal = () => setOpen(true);
     
@@ -68,8 +64,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
         } else if (htText) {
             send("DELETE", { id: hometask.id }, null);
         } else {
-            const body = { id: uuid(), date: dayDate, subject: subjShort, type, teacher, text };
-            const { date, ...newHt } = body;
+            const body = { id: uuid(), date: dayDate, subject: subjShort, type, teacher, text, groupNum };
+            const { date, groupNum: a, ...newHt } = body;
 
             send("POST", body, newHt);
         }
@@ -93,14 +89,14 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                     </div>
                 </div>
                 {
-                    subjShort === 'ФизК' ? null : 
+                    !firstName || !middleName ? null : 
                     <div className={styles.subjInfo}>
                         <p className={styles.smaller}>{lastName} {firstName[0]}.{middleName[0]}.</p>
                         <p className={styles.smaller}>{auditory}</p>
                     </div>
                 }
             </div>
-            <Modal open={open} onClose={closeModal}>
+            <Modal open={open} onClose={closeModal} style={{paddingInline: '30px'}}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
                 <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
@@ -115,8 +111,8 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                         <span className={styles.timetableItem}>{subgroup ? `подгр. ${subgroup}` : ''}</span>
                     </div>
                 </div>
-                {subjShort !== 'ФизК' ? <Btn onClick={() => setShowForm(!showForm)}>Д/З</Btn> : null}
-                <Form id={inputId} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
+                {subjShort !== 'ФизК' ? <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button> : null}
+                <Form id={inputId} className={styles.input} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
             </Modal>
         </li>
     ) : null;

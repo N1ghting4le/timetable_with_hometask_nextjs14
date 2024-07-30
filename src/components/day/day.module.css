@@ -1,7 +1,4 @@
 .day {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     background-color: #393E46;
     color: #fff;
     box-shadow: 5px 5px 10px gray;
@@ -18,38 +15,39 @@
 }
 
 .text {
+    margin-bottom: 10px;
     padding: 3px 10px;
     font-size: 1.5rem;
     font-weight: bolder;
+    border-radius: 5px;
+    cursor: pointer;
     transition: all 0.2s ease-in-out;
 }
 
 .text:hover {
     background-color: #303030;
-    box-shadow: 0 0 5px #303030, 0 0 5px #303030;
-    border-radius: 5px;
-    cursor: pointer;
+    box-shadow: 0 0 5px #303030;
 }
 
-.wrapper {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
+.notes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .addNoteBtn {
-    position: fixed;
-    transform: translate(-100%, -100%);
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 0;
     font-size: 36px;
     box-shadow: 5px 5px 7px gray;
-    background-color: #393E46;
-    color: #00ADB5;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
 }
 
 .addNoteBtn:hover {
@@ -62,20 +60,19 @@
 
 .input {
     min-height: 250px;
-    max-height: 500px;
 }
 
 .rubbishBin {
     position: absolute;
-    bottom: 15px;
-    left: 15px;
+    bottom: 20px;
+    left: 29px;
     cursor: pointer;
 }
 
 .backArrow {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 22px;
+    left: 29px;
     cursor: pointer;
 }
 

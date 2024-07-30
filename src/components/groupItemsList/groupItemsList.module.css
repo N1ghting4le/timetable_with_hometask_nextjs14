@@ -1,0 +1,10 @@
+.groups {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding-bottom: 15px;
+    padding-inline: 15px;
+    overflow-y: auto;
+}

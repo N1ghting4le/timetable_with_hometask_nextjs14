@@ -28,7 +28,7 @@
 
 .subject:hover {
     background-color: #303030;
-    box-shadow: 0 0 5px #303030, 0 0 5px #303030;
+    box-shadow: 0 0 5px #303030;
     border-radius: 5px;
 }
 
@@ -49,8 +49,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    right: 10px;
-    color: #00ADB5;
+    color: #78cfd4;
     justify-self: end;
 }
 
@@ -85,6 +84,14 @@
 .timetableItem {
     font-size: 0.9rem;
     color: rgb(104, 104, 104);
+}
+
+.input {
+    max-height: 150px;
+}
+
+.button {
+    padding: 5px 40px;
 }
 
 @media (max-width: 576px) {

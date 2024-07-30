@@ -15,12 +15,12 @@ const WeekList = () => {
     const elements = renderWeeks();
     
     return (
-        <div className={styles.weekWrapper}>
+        <main className={styles.weekWrapper}>
             <WeekControlPanel limit={weekList.length - 1}/>
             <div className={styles.weeks}>
                 {elements}
             </div>
-        </div>
+        </main>
     );
 }
 

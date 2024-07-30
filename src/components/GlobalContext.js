@@ -1,34 +1,41 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from "react";
+import Error from "@/app/error";
 import MobileDetect from "mobile-detect";
 import getTimetable from '@/server/actions';
 
 const Context = createContext(null);
 
-const GlobalContext = ({ children }) => {
+const GlobalContext = ({ groupNum, children }) => {
+    const [isError, setIsError] = useState(false);
     const [globalState, setGlobalState] = useState({
         subgroup: 0,
         curr: -2,
         prevCurr: -2,
         weekList: [],
+        groupNum,
         isDesktop: false
     });
 
     useEffect(() => {
-        getTimetable()
+        getTimetable(groupNum)
             .then(res => {
                 const { weekList, currWeekIndex: curr } = res;
+                const md = new MobileDetect(navigator.userAgent);
 
-                setGlobalState(state => ({...state, weekList, curr, prevCurr: curr}));
+                setGlobalState(state => ({
+                    ...state,  
+                    curr, 
+                    prevCurr: curr,
+                    weekList,
+                    isDesktop: !md.mobile()
+                }));
             })
             .catch(err => {
                 console.error(err);
+                setIsError(true);
             });
-
-        const md = new MobileDetect(navigator.userAgent);
-
-        setGlobalState(state => ({...state, isDesktop: !md.mobile()}));
     }, []);
 
     const provider = {
@@ -36,6 +43,7 @@ const GlobalContext = ({ children }) => {
         subgroup: globalState.subgroup,
         curr: globalState.curr,
         prevCurr: globalState.prevCurr,
+        groupNum: globalState.groupNum,
         isDesktop: globalState.isDesktop,
 
         setSubgroup(subgroup) {
@@ -69,7 +77,7 @@ const GlobalContext = ({ children }) => {
         }
     }
 
-    return (
+    return isError ? <Error/> : (
         <Context.Provider value={provider}>
             {children}
         </Context.Provider>
@@ -79,13 +87,14 @@ const GlobalContext = ({ children }) => {
 export default GlobalContext;
 
 const useWeekList = () => useContext(Context).weekList;
+const useGroupNum = () => useContext(Context).groupNum;
 const useIsDesktop = () => useContext(Context).isDesktop;
 const useWeek = (weekIndex) => useWeekList()[weekIndex];
 
 const useDay = (weekIndex, dayIndex) => {
     const day = useWeek(weekIndex).days[dayIndex],
           context = useContext(Context),
-          { setNotes, editNote, deleteNote } = context;
+        { setNotes, editNote, deleteNote } = context;
 
     return { ...day, setNotes, editNote, deleteNote };
 }
@@ -93,27 +102,28 @@ const useDay = (weekIndex, dayIndex) => {
 const useSubject = (weekIndex, dayIndex, subjectIndex) => {
     const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
           context = useContext(Context),
-          { setHometask } = context;
+        { setHometask } = context;
 
     return { ...subject, setHometask };
 }
 
 const useCurr = () => {
     const context = useContext(Context),
-          { curr, prevCurr, setCurr } = context;
+        { curr, prevCurr, setCurr } = context;
 
     return { curr, prevCurr, setCurr };
 }
 
 const useSubgroup = () => {
     const context = useContext(Context),
-          { subgroup, setSubgroup } = context;
+        { subgroup, setSubgroup } = context;
 
     return { subgroup, setSubgroup };
 }
 
 export {
     useWeekList,
+    useGroupNum,
     useIsDesktop,
     useCurr,
     useSubgroup,

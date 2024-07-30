@@ -3,35 +3,33 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    padding: 20px 30px;
+    padding-block: 20px;
     width: 400px;
     min-height: 310px;
-    max-height: 90vh;
-    overflow: auto;
     background-color: #fff;
+    transition: transform 0.2s ease-in-out;
 }
 
 .popup-overlay {
     background: rgba(0, 0, 0, 0.5);
 }
 
-@media (min-width: 992px) {
-    .popup-content::-webkit-scrollbar {
-        width: 4px;
-    }
-    
-    .popup-content::-webkit-scrollbar-thumb {
-        background-color: rgb(180, 179, 179);
-        border-radius: 2px;
-    }
-    
-    .popup-content::-webkit-scrollbar-track {
-        background: #fff;
-    }
+.animated-content {
+    animation: slide 0.25s ease-out;
 }
 
 @media (max-width: 576px) {
     .popup-content {
         max-width: 90vw;
+    }
+}
+
+@keyframes slide {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
     }
 }

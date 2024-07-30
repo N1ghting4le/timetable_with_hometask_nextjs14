@@ -1,0 +1,82 @@
+.groupItem {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #454b54;
+    box-shadow: 5px 5px 10px rgb(38, 38, 38);
+    transition: all 0.2s ease-in-out;
+}
+
+.groupNum {
+    color: #fff;
+    font-size: 20px;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.8rem;
+    color: #8bf8fe;
+}
+
+.groupItem:hover {
+    background-color: #303030;
+    box-shadow: 0 0 5px #303030;
+}
+
+.overlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+}
+
+.button::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 7px;
+    width: 10px;
+    height: 7px;
+	clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    background-color: inherit;
+}
+
+.button {
+    position: absolute;
+    padding-block: 7px;
+    width: 100px;
+    background-color: #fff;
+    z-index: 201;
+    color: #000;
+    border-radius: 3px;
+    box-shadow: 5px 5px 10px #393E46;
+    font-size: 1rem;
+    font-weight: 400;
+    transform-origin: left top;
+    animation: appear 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    hyphens: none;
+}
+
+.button:hover {
+    background-color: #d1d1d1;
+}
+
+@keyframes appear {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

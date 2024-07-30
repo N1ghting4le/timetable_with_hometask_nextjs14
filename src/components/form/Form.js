@@ -1,14 +1,13 @@
-import Btn from "../btn/Btn";
 import styles from "./form.module.css";
 
 const Form = ({id, className, onSubmit, process, cond, text}) => cond ? null : (
     <>
         <textarea id={id} type="text" autoFocus={true} defaultValue={text || ''} 
-                    className={className ? `${styles.input} ${className}` : styles.input}/>
+                    className={`${styles.input} ${className || ''}`}/>
         {
             process === 'pending' ? <p>Отправка...</p> :
             <>
-                <Btn onClick={onSubmit}>Подтвердить</Btn>
+                <button className={styles.button} onClick={onSubmit}>Подтвердить</button>
                 {
                     process === 'error' ? <p className={styles.error}>Произошла ошибка (разрабы дауны)</p> : null
                 }

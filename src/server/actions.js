@@ -1,6 +1,6 @@
 'use server';
 
-import { API_URL, SERVER_URL } from "@/env/env";
+import { FACULTY_API_URL, SCHEDULE_API_URL, GROUP_API_URL, SERVER_URL } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
     const res = await fetch(url, { method, headers, body, cache: 'no-store' });
@@ -12,9 +12,22 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
     return await res.json();
 }
 
-export default async function getTimetable() {
+export const getGroups = async () => {
     return new Promise((resolve, reject) => {
-        Promise.all([request(API_URL), request(`${SERVER_URL}/days`)])
+        Promise.all([request(GROUP_API_URL), request(FACULTY_API_URL)])
+            .then(([groups, faculties]) => resolve(groups.map(group => ({
+                groupNum: group.name,
+                faculty: faculties.find(item => item.id === group.facultyId).abbrev,
+                speciality: group.specialityName,
+                course: group.course
+            }))))
+            .catch(error => reject(error));
+    });
+}
+
+export default async function getTimetable(groupNum) {
+    return new Promise((resolve, reject) => {
+        Promise.all([request(`${SCHEDULE_API_URL}${groupNum}`), request(`${SERVER_URL}/days/${groupNum}`)])
             .then(values => resolve(parseTimetable(...values)))
             .catch(error => reject(error));
     });
@@ -32,7 +45,7 @@ const parseTimetable = (response, listOfWeeks) => {
     const timetable = days.map(item => {
         const day = schedules[item];
 
-        return {
+        return day ? {
             name: item,
             subjects: day.filter(subj => !exclusions.includes(subj.lessonTypeAbbrev)).map(subj => ({
                 auditories: subj.auditories.length ? subj.auditories : [""],
@@ -58,7 +71,7 @@ const parseTimetable = (response, listOfWeeks) => {
                     photoLink: ""
                 }]
             }))
-        }
+        } : null;
     });
 
     const weekList = listOfWeeks.map((item, i) => ({
@@ -67,9 +80,9 @@ const parseTimetable = (response, listOfWeeks) => {
 
             const dayDate = new Date(day.date).getTime(),
                     weekNum = i % 4 + 1,
-                    fullDayTimetable = timetable.find(unit => unit.name === day.name).subjects;
+                    fullDayTimetable = timetable.find(unit => unit?.name === day.name)?.subjects;
 
-            const subjects = fullDayTimetable.filter(subj => {
+            const subjects = fullDayTimetable?.filter(subj => {
                 const subjStartDate = getTime(subj.startLessonDate),
                         subjEndDate = getTime(subj.endLessonDate);
 
@@ -86,7 +99,7 @@ const parseTimetable = (response, listOfWeeks) => {
                 notes: day.notes,
                 subjects
             };
-        }).filter(day => day.subjects.length)
+        }).filter(day => day.subjects?.length)
     })).filter((item, i) => {
         if (!item.days.length) {
             if (firstEmptyWeek < 0) firstEmptyWeek = i;
