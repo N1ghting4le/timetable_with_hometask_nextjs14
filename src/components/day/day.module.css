@@ -85,11 +85,7 @@
         font-size: 1.2rem;
     }
 
-    .first {
-        border-radius: 20px 0 20px 0;
-    }
-
-    .second {
-        border-radius: 0 20px 0 20px;
+    .first, .second {
+        border-radius: 10px;
     }
 }
