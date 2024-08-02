@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
-import { useIsDesktop, useCurr, useWeek } from "../GlobalContext";
+import { useCurr, useWeek } from "../GlobalContext";
 import Day from "../day/Day";
 import styles from "./week.module.css";
 
 const Week = ({ weekIndex }) => {
     const { curr, prevCurr } = useCurr();
     const { days } = useWeek(weekIndex);
-    const isDesktop = useIsDesktop();
     const [display, setDisplay] = useState(curr === weekIndex);
     const [side, setSide] = useState(null);
     const ref = useRef({});
@@ -21,10 +20,9 @@ const Week = ({ weekIndex }) => {
                 return styles[prevCurr < weekIndex ? 'fromRight' : 'fromLeft'];
             });
         } else if (display) {
-            if (!isDesktop) return setDisplay(false);
-
             setTimeout(() => setDisplay(false), 300);
     
+            ref.current.style.position = 'absolute';
             ref.current.style.transform = `translateX(${curr > weekIndex ? -100 : 100}%)`;
         }
     }, [curr]);

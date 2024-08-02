@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import Error from "@/app/error";
-import MobileDetect from "mobile-detect";
 import getTimetable from '@/server/actions';
 
 const Context = createContext(null);
@@ -14,22 +13,19 @@ const GlobalContext = ({ groupNum, children }) => {
         curr: -2,
         prevCurr: -2,
         weekList: [],
-        groupNum,
-        isDesktop: false
+        groupNum
     });
 
     useEffect(() => {
         getTimetable(groupNum)
             .then(res => {
                 const { weekList, currWeekIndex: curr } = res;
-                const md = new MobileDetect(navigator.userAgent);
 
                 setGlobalState(state => ({
                     ...state,  
                     curr, 
                     prevCurr: curr,
-                    weekList,
-                    isDesktop: !md.mobile()
+                    weekList
                 }));
             })
             .catch(err => {
@@ -44,7 +40,6 @@ const GlobalContext = ({ groupNum, children }) => {
         curr: globalState.curr,
         prevCurr: globalState.prevCurr,
         groupNum: globalState.groupNum,
-        isDesktop: globalState.isDesktop,
 
         setSubgroup(subgroup) {
             setGlobalState(state => ({...state, subgroup}));
@@ -88,7 +83,6 @@ export default GlobalContext;
 
 const useWeekList = () => useContext(Context).weekList;
 const useGroupNum = () => useContext(Context).groupNum;
-const useIsDesktop = () => useContext(Context).isDesktop;
 const useWeek = (weekIndex) => useWeekList()[weekIndex];
 
 const useDay = (weekIndex, dayIndex) => {
@@ -124,7 +118,6 @@ const useSubgroup = () => {
 export {
     useWeekList,
     useGroupNum,
-    useIsDesktop,
     useCurr,
     useSubgroup,
     useWeek,

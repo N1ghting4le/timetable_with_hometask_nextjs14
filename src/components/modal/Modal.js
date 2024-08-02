@@ -7,7 +7,7 @@ import "./popup.css";
 
 const Modal = ({ open, onClose, style, animated, children }) => {
     useEffect(() => {
-        document.documentElement.style.overflowY = open ? 'hidden' : 'auto';
+        document.scrollingElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
 
     return (
