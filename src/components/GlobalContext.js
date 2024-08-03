@@ -10,8 +10,8 @@ const GlobalContext = ({ groupNum, children }) => {
     const [isError, setIsError] = useState(false);
     const [globalState, setGlobalState] = useState({
         subgroup: 0,
-        curr: -2,
-        prevCurr: -2,
+        prev: -1,
+        curr: -1,
         weekList: [],
         groupNum
     });
@@ -22,9 +22,9 @@ const GlobalContext = ({ groupNum, children }) => {
                 const { weekList, currWeekIndex: curr } = res;
 
                 setGlobalState(state => ({
-                    ...state,  
-                    curr, 
-                    prevCurr: curr,
+                    ...state,
+                    prev: curr,
+                    curr,
                     weekList
                 }));
             })
@@ -37,8 +37,8 @@ const GlobalContext = ({ groupNum, children }) => {
     const provider = {
         weekList: globalState.weekList,
         subgroup: globalState.subgroup,
+        prev: globalState.prev,
         curr: globalState.curr,
-        prevCurr: globalState.prevCurr,
         groupNum: globalState.groupNum,
 
         setSubgroup(subgroup) {
@@ -46,7 +46,7 @@ const GlobalContext = ({ groupNum, children }) => {
         },
 
         setCurr(curr) {
-            setGlobalState(state => ({...state, prevCurr: state.curr, curr}));
+            setGlobalState(state => ({...state, prev: state.curr, curr}));
         },
 
         setNotes(newNoteList, weekIndex, dayIndex) {
@@ -103,9 +103,9 @@ const useSubject = (weekIndex, dayIndex, subjectIndex) => {
 
 const useCurr = () => {
     const context = useContext(Context),
-        { curr, prevCurr, setCurr } = context;
+        { prev, curr, setCurr } = context;
 
-    return { curr, prevCurr, setCurr };
+    return { prev, curr, setCurr };
 }
 
 const useSubgroup = () => {

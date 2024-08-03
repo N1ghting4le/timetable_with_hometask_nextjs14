@@ -6,7 +6,7 @@ import Day from "../day/Day";
 import styles from "./week.module.css";
 
 const Week = ({ weekIndex }) => {
-    const { curr, prevCurr } = useCurr();
+    const { prev, curr } = useCurr();
     const { days } = useWeek(weekIndex);
     const [display, setDisplay] = useState(curr === weekIndex);
     const ref = useRef({});
@@ -14,7 +14,7 @@ const Week = ({ weekIndex }) => {
     useEffect(() => {
         if (curr === weekIndex) {
             setDisplay(true);
-        } else if (prevCurr === weekIndex) {
+        } else if (prev === weekIndex) {
             setTimeout(() => setDisplay(false), 300);
             
             ref.current.style.position = 'absolute';
@@ -25,9 +25,9 @@ const Week = ({ weekIndex }) => {
     }, [curr]);
 
     const chooseAnimation = () => {
-        if (prevCurr === weekIndex) return '';
+        if (prev === weekIndex) return '';
 
-        return styles[prevCurr < weekIndex ? 'fromRight' : 'fromLeft'];
+        return styles[prev < weekIndex ? 'fromRight' : 'fromLeft'];
     }
 
     const renderDays = () => days.map((item, i) => (
@@ -39,7 +39,7 @@ const Week = ({ weekIndex }) => {
     const elements = renderDays();
 
     return display ? (
-        <div className={`${styles.week} ${chooseAnimation()}`} ref={el => ref.current = el}>
+        <div className={`${styles.week} ${chooseAnimation()}`} ref={ref}>
             {elements}
         </div>
     ) : null;
