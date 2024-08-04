@@ -10,6 +10,32 @@
     transition: transform 0.3s ease-in-out;
 }
 
+.fromLeft {
+    animation: movementFromLeft 0.3s ease-in-out;
+}
+
+.fromRight {
+    animation: movementFromRight 0.3s ease-in-out;
+}
+
+.toLeft {
+    position: absolute;
+    transform: translateX(-100%);
+}
+
+.toRight {
+    position: absolute;
+    transform: translateX(100%);
+}
+
+@media (max-width: 576px) {
+    .week {
+        display: flex;
+        flex-direction: column;
+        padding: 5vh 0;
+    }
+}
+
 @keyframes movementFromLeft {
     from {
         transform: translateX(-100%);
@@ -27,21 +53,5 @@
 
     to {
         transform: translateX(0);
-    }
-}
-
-.fromLeft {
-    animation: movementFromLeft 0.3s ease-in-out;
-}
-
-.fromRight {
-    animation: movementFromRight 0.3s ease-in-out;
-}
-
-@media (max-width: 576px) {
-    .week {
-        display: flex;
-        flex-direction: column;
-        padding: 5vh 0;
     }
 }

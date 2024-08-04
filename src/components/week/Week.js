@@ -17,8 +17,7 @@ const Week = ({ weekIndex }) => {
         } else if (prev === weekIndex) {
             setTimeout(() => setDisplay(false), 300);
             
-            ref.current.style.position = 'absolute';
-            ref.current.style.transform = `translateX(${curr > weekIndex ? -100 : 100}%)`;
+            ref.current.classList.add(styles[curr > weekIndex ? 'toLeft' : 'toRight']);
         } else if (display) {
             setDisplay(false);
         }
