@@ -16,8 +16,6 @@ const GroupItem = ({ group, setGroups }) => {
     const pathname = usePathname();
 
     const handleClick = () => {
-        localStorage.setItem(LOCAL_STORAGE_GROUP_NUM, groupNum);
-
         if (setGroups) return;
 
         const savedGroups = JSON.parse(localStorage.getItem(LOCAL_STORAGE_SAVED_GROUPS)) || [];

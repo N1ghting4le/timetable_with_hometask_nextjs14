@@ -1,5 +1,6 @@
 'use client';
 
+import { LOCAL_STORAGE_GROUP_NUM } from "@/env/env";
 import { createContext, useContext, useState, useEffect } from "react";
 import Error from "@/app/error";
 import getTimetable from '@/server/actions';
@@ -20,6 +21,8 @@ const GlobalContext = ({ groupNum, children }) => {
         getTimetable(groupNum)
             .then(res => {
                 const { weekList, currWeekIndex: curr } = res;
+
+                localStorage.setItem(LOCAL_STORAGE_GROUP_NUM, groupNum);
 
                 setGlobalState(state => ({
                     ...state,

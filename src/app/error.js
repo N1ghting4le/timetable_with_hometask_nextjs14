@@ -1,6 +1,5 @@
 'use client';
 
-import { LOCAL_STORAGE_GROUP_NUM } from '@/env/env';
 import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +7,6 @@ import styles from "./error.module.css";
  
 export default function Error({ error }) {
   useEffect(() => {
-    localStorage.removeItem(LOCAL_STORAGE_GROUP_NUM);
     console.error(error);
   }, [error]);
  
