@@ -64,7 +64,17 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
         } else if (htText) {
             send("DELETE", { id: hometask.id }, null);
         } else {
-            const body = { id: uuid(), date: dayDate, subject: subjShort, type, teacher, text, groupNum };
+            const body = { 
+                id: uuid(),
+                date: dayDate,
+                subject: subjShort,
+                type,
+                teacher,
+                text,
+                groupNum,
+                subgroup: numSubgroup
+            };
+
             const { date, groupNum: a, ...newHt } = body;
 
             send("POST", body, newHt);

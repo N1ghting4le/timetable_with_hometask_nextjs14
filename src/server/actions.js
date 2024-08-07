@@ -87,10 +87,20 @@ const parseTimetable = (response, listOfWeeks) => {
                         subjEndDate = getTime(subj.endLessonDate);
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
-            }).map(subj => ({
-                ...subj,
-                hometask: day.hometasks.find(task => task.subject === subj.subjShort && task.type === subj.type && (task.subject !== 'ИнЯз' || JSON.stringify(task.teacher) === JSON.stringify(subj.employees[0]))) || null
-            }));
+            }).map(subj => {
+                const { subjShort, type: subjType, employees, numSubgroup } = subj;
+                
+                return {
+                    ...subj,
+                    hometask: day.hometasks.find(task => {
+                        const { subject, type: taskType, teacher, subgroup } = task;
+
+                        return subject === subjShort && taskType === subjType && 
+                               subgroup === numSubgroup && 
+                               (subject !== 'ИнЯз' || JSON.stringify(teacher) === JSON.stringify(employees[0]));
+                    }) || null
+                }
+            });
 
             return {
                 date: day.date,
