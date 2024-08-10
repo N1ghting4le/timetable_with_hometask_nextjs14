@@ -1,0 +1,13 @@
+.groups-content {
+    animation: slide 0.25s ease-out;
+}
+
+@keyframes slide {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}

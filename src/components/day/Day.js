@@ -8,9 +8,10 @@ import Image from "next/image";
 import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { useDay, useGroupNum } from "../GlobalContext";
-import styles from "./day.module.css";
 import Form from "../form/Form";
 import { v4 as uuid } from 'uuid';
+import styles from "./day.module.css";
+import './modal.css'
 
 const Day = ({ weekIndex, dayIndex }) => {
     const { date, day, subjects, notes, setNotes, editNote, deleteNote } = useDay(weekIndex, dayIndex);
@@ -20,7 +21,6 @@ const Day = ({ weekIndex, dayIndex }) => {
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const url = `${SERVER_URL}/notes`;
     const inputId = "noteInput";
-    const modalStyle = { paddingInline: '30px', maxHeight: '90vh'};
 
     const openModal = () => setOpen(1);
     
@@ -104,7 +104,7 @@ const Day = ({ weekIndex, dayIndex }) => {
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>
-            <Modal open={!!open} onClose={() => closeModal()} style={modalStyle}>
+            <Modal open={!!open} onClose={() => closeModal()} className="day">
                 {modalContent}
             </Modal>
         </div>

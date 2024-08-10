@@ -7,29 +7,14 @@
     width: 400px;
     min-height: 310px;
     background-color: #fff;
-    transition: transform 0.2s ease-in-out;
 }
 
 .popup-overlay {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.animated-content {
-    animation: slide 0.25s ease-out;
-}
-
 @media (max-width: 576px) {
     .popup-content {
         max-width: 90vw;
-    }
-}
-
-@keyframes slide {
-    from {
-        transform: translateX(-100%);
-    }
-
-    to {
-        transform: translateX(0);
     }
 }

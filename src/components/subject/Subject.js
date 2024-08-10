@@ -9,6 +9,7 @@ import Form from "../form/Form";
 import { useSubgroup, useSubject, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
+import "./modal.css";
 
 const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
     const { 
@@ -106,7 +107,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                     </div>
                 }
             </div>
-            <Modal open={open} onClose={closeModal} style={{paddingInline: '30px'}}>
+            <Modal open={open} onClose={closeModal} className="subject">
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
                 <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>

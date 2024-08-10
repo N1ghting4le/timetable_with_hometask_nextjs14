@@ -23,11 +23,11 @@ const Week = ({ weekIndex }) => {
         }
     }, [curr]);
 
-    const chooseAnimation = () => {
+    const animation = (() => {
         if (prev === weekIndex) return '';
 
         return styles[prev < weekIndex ? 'fromRight' : 'fromLeft'];
-    }
+    })();
 
     const renderDays = () => days.map((item, i) => (
         <Day key={item.date}
@@ -38,7 +38,7 @@ const Week = ({ weekIndex }) => {
     const elements = renderDays();
 
     return display ? (
-        <div className={`${styles.week} ${chooseAnimation()}`} ref={ref}>
+        <div className={`${styles.week} ${animation}`} ref={ref}>
             {elements}
         </div>
     ) : null;

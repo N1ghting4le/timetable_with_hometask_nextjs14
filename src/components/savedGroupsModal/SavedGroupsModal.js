@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Modal from '../modal/Modal';
 import GroupItemsList from '../groupItemsList/GroupItemsList';
 import styles from './savedGroupsModal.module.css';
+import './modal.css';
 
 const SavedGroupsModal = ({ buttonClass }) => {
     const [groups, setGroups] = useState([]);
@@ -18,7 +19,7 @@ const SavedGroupsModal = ({ buttonClass }) => {
     return (
         <>
             <button onClick={() => setOpen(true)} className={buttonClass}>Группы</button>
-            <Modal open={open} onClose={() => setOpen(false)} style={{margin: 0}} animated>
+            <Modal open={open} onClose={() => setOpen(false)} align="left top" className="groups">
                 <h2>Сохранённые группы:</h2>
                 <GroupItemsList groups={groups} setGroups={setGroups}/>
                 <Link href='/' className={styles.link}>Вернуться к выбору группы</Link>
