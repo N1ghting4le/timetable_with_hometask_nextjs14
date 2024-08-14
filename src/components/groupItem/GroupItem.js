@@ -1,19 +1,17 @@
 'use client'
 
 import { LOCAL_STORAGE_GROUP_NUM, LOCAL_STORAGE_SAVED_GROUPS } from '@/env/env';
-import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import useMouseCoords from '@/hooks/mouseCoords.hook';
+import useContextMenu from '@/hooks/contextMenu.hook';
+import ContextMenu from '../contextMenu/ContextMenu';
 import Link from 'next/link';
 import styles from './groupItem.module.css';
 
 const GroupItem = ({ group, setGroups }) => {
     const { groupNum, faculty, speciality, course } = group;
-    const [coords, setCoords] = useState({});
-    const [isActive, setIsActive] = useState(false);
-    const [isOverlay, setIsOverlay] = useState(false);
-    const getPosition = useMouseCoords();
     const pathname = usePathname();
+    const contextWidth = 100;
+    const { triggerContextMenu, ...props } = useContextMenu(contextWidth);
 
     const handleClick = () => {
         if (setGroups) return;
@@ -28,13 +26,7 @@ const GroupItem = ({ group, setGroups }) => {
     const handleRightClick = (e) => {
         if (!setGroups) return;
         
-        e.preventDefault();
-
-        const { x, y } = getPosition(e, 100);
-
-        setIsActive(true);
-        setIsOverlay(true);
-        setCoords({ left: `${x}px`, top: `${y}px` });
+        triggerContextMenu(e);
     }
 
     const deleteGroup = () => {
@@ -51,12 +43,6 @@ const GroupItem = ({ group, setGroups }) => {
         });
     }
 
-    const closeButton = (e) => {
-        setTimeout(() => setIsActive(false), 200);
-        setIsOverlay(false);
-        e.target.nextElementSibling.style.opacity = 0;
-    }
-
     return (
         <>
             <Link href={`/${groupNum}`} className={styles.groupItem} onClick={handleClick} onContextMenu={handleRightClick}>
@@ -66,8 +52,9 @@ const GroupItem = ({ group, setGroups }) => {
                     <p>{faculty} - {speciality}</p>
                 </div>
             </Link>
-            { isOverlay ? <div className={styles.overlay} onClick={closeButton}/> : null }
-            { isActive ? <button className={styles.button} onClick={deleteGroup} style={coords}>Удалить</button> : null } 
+            <ContextMenu {...props}>
+                <button onClick={deleteGroup}>Удалить</button>
+            </ContextMenu> 
         </>
     );
 }

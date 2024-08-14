@@ -87,13 +87,13 @@ export default GlobalContext;
 const useWeekList = () => useContext(Context).weekList;
 const useGroupNum = () => useContext(Context).groupNum;
 const useWeek = (weekIndex) => useWeekList()[weekIndex];
+const useDay = (weekIndex, dayIndex) => useWeek(weekIndex).days[dayIndex];
 
-const useDay = (weekIndex, dayIndex) => {
-    const day = useWeek(weekIndex).days[dayIndex],
-          context = useContext(Context),
+const useNotes = () => {
+    const context = useContext(Context),
         { setNotes, editNote, deleteNote } = context;
 
-    return { ...day, setNotes, editNote, deleteNote };
+    return { setNotes, editNote, deleteNote };
 }
 
 const useSubject = (weekIndex, dayIndex, subjectIndex) => {
@@ -125,5 +125,6 @@ export {
     useSubgroup,
     useWeek,
     useDay,
+    useNotes,
     useSubject
 };

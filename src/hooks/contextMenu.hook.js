@@ -1,6 +1,20 @@
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 
-const useMouseCoords = () => {
+const useContextMenu = (width) => {
+    const [isActive, setIsActive] = useState(false);
+    const [isOverlay, setIsOverlay] = useState(false);
+    const [coords, setCoords] = useState({});
+
+    const triggerContextMenu = useCallback((e) => {
+        e.preventDefault();
+
+        const { x, y } = getPosition(e, width);
+
+        setIsActive(true);
+        setIsOverlay(true);
+        setCoords({ left: `${x}px`, top: `${y}px` });
+    }, []);
+
     const getPosition = useCallback((e, offset = 0) => {
         let x = 0, y = 0;
         
@@ -23,7 +37,7 @@ const useMouseCoords = () => {
         return { x, y };
     }, []);
 
-    return getPosition;
+    return { triggerContextMenu, isActive, setIsActive, isOverlay, setIsOverlay, coords, width };
 }
 
-export default useMouseCoords;
+export default useContextMenu;

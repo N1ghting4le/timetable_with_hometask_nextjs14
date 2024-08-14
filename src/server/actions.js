@@ -98,7 +98,14 @@ const parseTimetable = (response, listOfWeeks) => {
                         return subject === subjShort && taskType === subjType && 
                                subgroup === numSubgroup && 
                                (subject !== 'ИнЯз' || JSON.stringify(teacher) === JSON.stringify(employees[0]));
-                    }) || null
+                    }) || null,
+                    color: (() => {
+                        switch (subjType) {
+                            case 'ЛК': return 'green';
+                            case 'ПЗ': return 'yellow';
+                            case 'ЛР': return 'red';
+                        }
+                    })()
                 }
             });
 

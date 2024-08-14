@@ -2,10 +2,9 @@
 
 import { useEffect } from "react";
 import Popup from "reactjs-popup";
-import ModalCloser from "../modalCloser/ModalCloser";
 import "./modal.css";
 
-const Modal = ({ open, onClose, style, className, align, children }) => {
+const Modal = ({ open, onClose, style, className, align, process, children }) => {
     useEffect(() => {
         document.scrollingElement.style.overflowY = open ? 'hidden' : 'auto';
     }, [open]);
@@ -26,8 +25,11 @@ const Modal = ({ open, onClose, style, className, align, children }) => {
     })();
 
     return (
-        <Popup modal open={open} onClose={onClose} contentStyle={{margin, ...style}} className={className}>
-            <ModalCloser onClick={onClose}/>
+        <Popup modal open={open} onClose={onClose} contentStyle={{margin, ...style}} 
+                className={className} closeOnDocumentClick={process !== 'pending'}>
+            <div className="modal_closer_wrapper">
+                <div className="modal_closer" onClick={onClose}>&times;</div>
+            </div>
             {children}
         </Popup>
     );

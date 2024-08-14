@@ -14,7 +14,7 @@ import "./modal.css";
 const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
     const { 
         auditories, start, end, numSubgroup, subject, subjShort,
-        type, note, weeks, employees, hometask, setHometask
+        type, note, weeks, employees, hometask, setHometask, color
     } = useSubject(weekIndex, dayIndex, subjectIndex);
     const { subgroup } = useSubgroup();
     const groupNum = useGroupNum();
@@ -36,12 +36,12 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
         resetQueryState();
     }
 
-    const color = () => {
-        switch (type) {
-            case 'ЛК': return 'green';
-            case 'ПЗ': return 'yellow';
-            case 'ЛР': return 'red';
-        }
+    const sendRequest = async (method, body, newHt) => {
+        query(url, method, JSON.stringify(body))
+            .then(() => {
+                setHometask(weekIndex, dayIndex, subjectIndex, newHt);
+                closeModal();
+            });
     }
 
     const sendHometask = () => {
@@ -50,20 +50,12 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
         
         if (htText === text || (!htText && !text)) return closeModal();
 
-        const send = async (method, body, newHt) => {
-            query(url, method, JSON.stringify(body))
-                .then(() => {
-                    setHometask(weekIndex, dayIndex, subjectIndex, newHt);
-                    closeModal();
-                });
-        }
-
         if (htText && text) {
             const body = { id: hometask.id, teacher, text };
 
-            send("PATCH", body, { ...hometask, teacher, text });
+            sendRequest("PATCH", body, { ...hometask, teacher, text });
         } else if (htText) {
-            send("DELETE", { id: hometask.id }, null);
+            sendRequest("DELETE", { id: hometask.id }, null);
         } else {
             const body = { 
                 id: uuid(),
@@ -78,7 +70,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
 
             const { date, groupNum: a, ...newHt } = body;
 
-            send("POST", body, newHt);
+            sendRequest("POST", body, newHt);
         }
     }
 
@@ -90,7 +82,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                         <p>{start}</p>
                         <p className={styles.smaller}>{end}</p>
                     </div>
-                    <div className={styles.line} style={{backgroundColor: color()}}/>
+                    <div className={styles.line} style={{backgroundColor: color}}/>
                     <div className={styles.textWrapper}>
                         <div className={styles.subjAndType}>
                             <p>{subjShort} ({type})</p>
@@ -107,9 +99,9 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                     </div>
                 }
             </div>
-            <Modal open={open} onClose={closeModal} className="subject">
+            <Modal open={open} onClose={closeModal} className="subject" process={queryState}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
-                <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color()}}/>
+                <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
                 <div className={styles.timetable}>
                     <div className={styles.timetableColumn}>

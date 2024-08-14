@@ -35,6 +35,20 @@ button:hover {
   box-shadow: 0 0 5px #303030;
 }
 
+#context_menu button {
+  padding-block: 7px;
+  width: 100%;
+  color: #000;
+  background-color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+#context_menu button:hover {
+  background-color: #e6e6e6;
+  box-shadow: none;
+}
+
 ul {
   list-style-type: none;
 }

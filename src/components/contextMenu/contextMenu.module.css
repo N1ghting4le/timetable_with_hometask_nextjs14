@@ -1,0 +1,41 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+}
+
+.conetxtMenu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 7px;
+    width: 10px;
+    height: 7px;
+	clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    background-color: inherit;
+}
+
+.conetxtMenu {
+    position: fixed;
+    background-color: #fff;
+    z-index: 201;
+    border-radius: 3px;
+    box-shadow: 5px 5px 15px #393E46;
+    font-size: 1rem;
+    transform-origin: left top;
+    animation: appear 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
+    hyphens: none;
+}
+
+@keyframes appear {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
