@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import Note from "../note/Note";
+import Note from "../Note/Note";
 import styles from './noteList.module.css';
 
 const NoteList = ({ notes, setOpen, setActiveIndex, queryState, resetQueryState, sendRequest }) => {
