@@ -5,6 +5,7 @@
     padding: 1rem;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    user-select: none;
 }
 
 .note:hover {

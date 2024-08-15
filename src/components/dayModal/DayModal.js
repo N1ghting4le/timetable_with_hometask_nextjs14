@@ -1,7 +1,7 @@
 'use client';
 
 import { SERVER_URL } from '@/env/env';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
 import useQuery from '@/hooks/query.hook';
 import { useGroupNum, useNotes } from '../GlobalContext';
 import { v4 as uuid } from 'uuid';
@@ -11,6 +11,8 @@ import Form from '../form/Form';
 import NoteList from '../noteList/NoteList';
 import styles from './dayModal.module.css';
 import "./modal.css";
+
+const Context = createContext();
 
 const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
     const { setNotes, editNote } = useNotes();
@@ -30,13 +32,13 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = async (method, body, newNoteList) => {
+    const sendRequest = async (method, body, newNoteList) => (
         query(url, method, JSON.stringify(body))
             .then(() => {
                 setNotes(newNoteList, weekIndex, dayIndex);
                 closeModal(1);
-            });
-    }
+            })
+    );
 
     const sendNote = () => {
         const text = document.querySelector(`#${inputId}`).value;
@@ -53,20 +55,16 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         }
     }
 
+    const provider = { setOpen, setActiveIndex: setActiveNoteIndex, queryState, sendRequest };
+
     return (
         <Modal open={!!open} onClose={() => closeModal()} className="day" process={queryState}>
             {
                 open === 1 ?
-                <>
-                    <NoteList 
-                        notes={notes}
-                        setOpen={setOpen}
-                        setActiveIndex={setActiveNoteIndex}
-                        queryState={queryState}
-                        resetQueryState={resetQueryState}
-                        sendRequest={sendRequest}/>
+                <Context.Provider value={provider}>
+                    <NoteList notes={notes} resetQueryState={resetQueryState}/>
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
-                </> :
+                </Context.Provider> :
                 <>
                     <Image src="https://img.icons8.com/windows/32/return.png"
                             alt="return arrow" 
@@ -88,3 +86,5 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
 }
 
 export default DayModal;
+
+export const useNote = () => useContext(Context);

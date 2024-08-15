@@ -1,13 +1,15 @@
 'use client';
 
+import { useNote } from '../dayModal/DayModal';
 import { useNotes } from '../GlobalContext';
 import useContextMenu from '@/hooks/contextMenu.hook';
 import QueryStateDisplay from "../queryStateDisplay/QueryStateDisplay";
 import ContextMenu from '../contextMenu/ContextMenu';
 import styles from './note.module.css';
 
-const Note = ({ i, notes, setOpen, setActiveIndex, sendRequest, queryState, triggerIndex, setTriggerIndex }) => {
+const Note = ({ i, notes, triggerIndex, setTriggerIndex }) => {
     const { id, text } = notes[i];
+    const { setOpen, setActiveIndex, queryState, sendRequest } = useNote();
     const { deleteNote } = useNotes();
     const contextWidth = 150;
     const { triggerContextMenu, ...props } = useContextMenu(contextWidth);
@@ -18,7 +20,8 @@ const Note = ({ i, notes, setOpen, setActiveIndex, sendRequest, queryState, trig
         setActiveIndex(i);
     }
 
-    const removeNote = () => sendRequest("DELETE", { id }, deleteNote(notes, i));
+    const removeNote = () => sendRequest("DELETE", { id }, deleteNote(notes, i))
+                                .then(() => setTriggerIndex(-1));
 
     const onContextMenu = (e) => {
         if (isDisabled) return;
