@@ -79,7 +79,7 @@ const parseTimetable = (response, listOfWeeks) => {
             if (day.date === dateStr) currWeekIndex = i;
 
             const dayDate = new Date(day.date).getTime(),
-                    weekNum = i % 4 + 1,
+                    weekNum = (day.week - 1) % 4 + 1,
                     fullDayTimetable = timetable.find(unit => unit?.name === day.name)?.subjects;
 
             const subjects = fullDayTimetable?.filter(subj => {
