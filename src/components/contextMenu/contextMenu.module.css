@@ -1,7 +1,6 @@
 .overlay {
     position: fixed;
     inset: 0;
-    z-index: 200;
 }
 
 .conetxtMenu::before {
@@ -18,7 +17,6 @@
 .conetxtMenu {
     position: fixed;
     background-color: #fff;
-    z-index: 201;
     border-radius: 3px;
     box-shadow: 5px 5px 15px #393E46;
     font-size: 1rem;
