@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import GroupsContext from '@/components/GroupsContext';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata = {
   title: 'Разрабы дауны',

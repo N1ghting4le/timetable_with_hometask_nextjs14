@@ -64,7 +64,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                 <Context.Provider value={provider}>
                     <NoteList notes={notes} resetQueryState={resetQueryState}/>
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
-                </Context.Provider> :
+                </Context.Provider> : open === 2 ?
                 <>
                     <Image src="https://img.icons8.com/windows/32/return.png"
                             alt="return arrow" 
@@ -79,7 +79,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                         onSubmit={sendNote}
                         process={queryState}
                         text={activeNote?.text}/>
-                </>
+                </> : null
             }
         </Modal>
     );

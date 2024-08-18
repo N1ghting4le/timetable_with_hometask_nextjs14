@@ -24,9 +24,11 @@
     transition: all 0.2s ease-in-out;
 }
 
-.text:hover {
-    background-color: #303030;
-    box-shadow: 0 0 5px #303030;
+@media (min-width: 577px) {
+    .text:hover {
+        background-color: #303030;
+        box-shadow: 0 0 5px #303030;
+    }
 }
 
 @media (max-width: 576px) {

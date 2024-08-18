@@ -30,11 +30,6 @@ button {
   border-radius: 5px;
 }
 
-button:hover {
-  background-color: #303030;
-  box-shadow: 0 0 5px #303030;
-}
-
 #context_menu button {
   padding-block: 7px;
   width: 100%;
@@ -53,9 +48,15 @@ ul {
   list-style-type: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@media (min-width: 577px) {
+  button:hover {
+    background-color: #303030;
+    box-shadow: 0 0 5px #303030;
+  }
+
+  #context_menu button:hover {
+    background-color: #e6e6e6;
+    box-shadow: none;
   }
 }
 
@@ -75,5 +76,11 @@ ul {
   
   *::-webkit-scrollbar-track {
     background-color: transparent;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
   }
 }
