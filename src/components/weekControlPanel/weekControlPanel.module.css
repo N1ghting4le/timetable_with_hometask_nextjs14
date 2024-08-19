@@ -50,7 +50,6 @@
     .buttons {
         justify-content: center;
         order: 1;
-        width: 100%;
     }
 
     .buttonStyle {
@@ -61,8 +60,7 @@
 
     .wrapper {
         flex-wrap: wrap;
-        width: 100%;
-        padding-inline: 5vw;
+        width: min-content;
     }
 
     .subgrButt {
