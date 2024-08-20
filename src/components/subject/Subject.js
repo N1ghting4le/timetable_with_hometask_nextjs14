@@ -91,13 +91,10 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                         { hometask ? <p className={styles.htText}>{hometask.text}</p> : null}
                     </div>
                 </div>
-                {
-                    !firstName || !middleName ? null : 
-                    <div className={styles.subjInfo}>
-                        <p className={styles.smaller}>{lastName} {firstName[0]}.{middleName[0]}.</p>
-                        <p className={styles.smaller}>{auditory}</p>
-                    </div>
-                }
+                <div className={styles.subjInfo}>
+                    <p className={styles.smaller}>{lastName}{firstName ? ` ${firstName[0]}.` : ''}{middleName ? ` ${middleName[0]}.` : ''}</p>
+                    <p className={styles.smaller}>{auditory}</p>
+                </div>
             </div>
             <Modal open={open} onClose={closeModal} className="subject" process={queryState}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
