@@ -1,22 +1,8 @@
-'use client';
-
-import { useState, useEffect } from "react";
 import Note from "../Note/Note";
 import styles from './noteList.module.css';
 
-const NoteList = ({ notes, resetQueryState }) => {
-    const [triggerIndex, setTriggerIndex] = useState(-1);
-
-    useEffect(() => resetQueryState(), [triggerIndex]);
-
-    const renderNotes = () => notes.map((note, i) => (
-        <Note
-            key={note.id}
-            i={i}
-            notes={notes}
-            triggerIndex={triggerIndex}
-            setTriggerIndex={setTriggerIndex}/>
-    ));
+const NoteList = ({ notes }) => {
+    const renderNotes = () => notes.map((note, i) => <Note key={note.id} i={i} notes={notes}/>);
 
     const noteElems = renderNotes();
 

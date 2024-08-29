@@ -1,14 +1,8 @@
+import { useContextMenu } from '../WithContextMenu';
 import styles from './contextMenu.module.css';
 
-const ContextMenu = ({ children, ...props }) => {
-    const { isActive, setIsActive, isOverlay, setIsOverlay, coords, width } = props;
-    const id = "context_menu";
-
-    const closeMenu = () => {
-        setTimeout(() => setIsActive(false), 200);
-        setIsOverlay(false);
-        document.getElementById(id).style.opacity = 0;
-    }
+const ContextMenu = ({ children }) => {
+    const { isActive, isOverlay, width, coords, id, closeMenu } = useContextMenu();
 
     return (
         <>

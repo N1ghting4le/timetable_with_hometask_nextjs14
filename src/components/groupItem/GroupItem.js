@@ -2,16 +2,14 @@
 
 import { LOCAL_STORAGE_GROUP_NUM, LOCAL_STORAGE_SAVED_GROUPS } from '@/env/env';
 import { usePathname } from 'next/navigation';
-import useContextMenu from '@/hooks/contextMenu.hook';
+import WithContextMenu from '../WithContextMenu';
 import ContextMenu from '../contextMenu/ContextMenu';
 import Link from 'next/link';
 import styles from './groupItem.module.css';
 
-const GroupItem = ({ group, setGroups }) => {
+const GroupItem = WithContextMenu(({ group, setGroups, triggerContextMenu }) => {
     const { groupNum, faculty, speciality, course } = group;
     const pathname = usePathname();
-    const contextWidth = 100;
-    const { triggerContextMenu, ...props } = useContextMenu(contextWidth);
 
     const handleClick = () => {
         if (setGroups) return;
@@ -52,11 +50,11 @@ const GroupItem = ({ group, setGroups }) => {
                     <p>{faculty} - {speciality}</p>
                 </div>
             </Link>
-            <ContextMenu {...props}>
+            <ContextMenu>
                 <button onClick={deleteGroup}>Удалить</button>
             </ContextMenu> 
         </>
     );
-}
+}, { width: 100 });
 
 export default GroupItem;

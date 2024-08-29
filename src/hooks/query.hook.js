@@ -7,7 +7,7 @@ const useQuery = () => {
     const [queryState, setQueryState] = useState('idle');
 
     const query = useCallback((url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
             setQueryState('pending');
 
             try {
@@ -16,6 +16,7 @@ const useQuery = () => {
                 resolve(res);
             } catch (e) {
                 setQueryState('error');
+                reject(e);
                 console.error(e);
             }
         });

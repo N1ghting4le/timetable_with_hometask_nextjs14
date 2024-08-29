@@ -62,7 +62,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
             {
                 open === 1 ?
                 <Context.Provider value={provider}>
-                    <NoteList notes={notes} resetQueryState={resetQueryState}/>
+                    <NoteList notes={notes}/>
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
                 </Context.Provider> : open === 2 ?
                 <>
