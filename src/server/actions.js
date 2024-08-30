@@ -55,7 +55,7 @@ const parseTimetable = (response, listOfWeeks) => {
                 end: subj.endLessonTime,
                 numSubgroup: subj.numSubgroup,
                 subjShort: subj.subject,
-                subject: subj.subjectFullName,
+                subjName: subj.subjectFullName,
                 type: subj.lessonTypeAbbrev,
                 weeks: subj.weekNumber,
                 note: subj.note,

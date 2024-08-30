@@ -44,36 +44,27 @@ const GlobalContext = ({ groupNum, children }) => {
         curr: globalState.curr,
         groupNum: globalState.groupNum,
 
-        setSubgroup(subgroup) {
-            setGlobalState(state => ({...state, subgroup}));
+        setSubgroup: (subgroup) => setGlobalState(state => ({...state, subgroup})),
+        setCurr: (curr) => setGlobalState(state => ({...state, prev: state.curr, curr})),
+
+        createHometaskSetter: (weekIndex, dayIndex, subjectIndex) => (newHometask) => {
+            const weekList = globalState.weekList;
+
+            weekList[weekIndex].days[dayIndex].subjects[subjectIndex].hometask = newHometask;
+            setGlobalState(state => ({...state, weekList}));
         },
 
-        setCurr(curr) {
-            setGlobalState(state => ({...state, prev: state.curr, curr}));
-        },
-
-        setNotes(newNoteList, weekIndex, dayIndex) {
+        createNotesSetter: (weekIndex, dayIndex) => (newNoteList) => {
             const weekList = globalState.weekList;
 
             weekList[weekIndex].days[dayIndex].notes = newNoteList;
             setGlobalState(state => ({...state, weekList}));
         },
 
-        deleteNote(notes, noteIndex) {
-            return notes.filter((_, i) => i !== noteIndex);
-        },
-
-        editNote(notes, noteIndex, text) {
-            return notes.map((note, i) => i === noteIndex ? ({...note, text}) : note);
-        },
-
-        setHometask(weekIndex, dayIndex, subjectIndex, newHometask) {
-            const weekList = globalState.weekList;
-
-            weekList[weekIndex].days[dayIndex].subjects[subjectIndex].hometask = newHometask;
-            setGlobalState(state => ({...state, weekList}));
-        }
-    }
+        deleteNote: (notes, noteIndex) => notes.filter((_, i) => i !== noteIndex),
+        editNote: (notes, noteIndex, text) => 
+            notes.map((note, i) => i === noteIndex ? ({...note, text}) : note),
+    };
 
     return isError ? <Error/> : (
         <Context.Provider value={provider}>
@@ -88,20 +79,14 @@ const useWeekList = () => useContext(Context).weekList;
 const useGroupNum = () => useContext(Context).groupNum;
 const useWeek = (weekIndex) => useWeekList()[weekIndex];
 const useDay = (weekIndex, dayIndex) => useWeek(weekIndex).days[dayIndex];
+const useSubject = (weekIndex, dayIndex, subjectIndex) => 
+    useContext(Context).createHometaskSetter(weekIndex, dayIndex, subjectIndex);
 
-const useNotes = () => {
+const useNotes = (weekIndex, dayIndex) => {
     const context = useContext(Context),
-        { setNotes, editNote, deleteNote } = context;
+        { createNotesSetter, editNote, deleteNote } = context;
 
-    return { setNotes, editNote, deleteNote };
-}
-
-const useSubject = (weekIndex, dayIndex, subjectIndex) => {
-    const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
-          context = useContext(Context),
-        { setHometask } = context;
-
-    return { ...subject, setHometask };
+    return { setNotes: createNotesSetter(weekIndex, dayIndex), editNote, deleteNote };
 }
 
 const useCurr = () => {

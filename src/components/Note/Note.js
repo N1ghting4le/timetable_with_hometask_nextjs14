@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNote } from '../dayModal/DayModal';
-import { useNotes } from '../GlobalContext';
 import QueryStateDisplay from "../queryStateDisplay/QueryStateDisplay";
 import WithContextMenu from '../WithContextMenu';
 import ContextMenu from '../contextMenu/ContextMenu';
@@ -12,8 +11,7 @@ const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
     const { id, text } = notes[i];
     const [isPending, setIsPending] = useState(false);
     const [isError, setIsError] = useState(false);
-    const { setOpen, setActiveIndex, queryState, sendRequest } = useNote();
-    const { deleteNote } = useNotes();
+    const { setOpen, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
     const isDisabled = queryState === 'pending';
 
     useEffect(() => {

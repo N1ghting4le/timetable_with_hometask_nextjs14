@@ -2,7 +2,7 @@
 
 import DayModal from "../dayModal/DayModal";
 import Subject from "../subject/Subject";
-import { useDay } from "../GlobalContext";
+import { useDay, useSubject } from "../GlobalContext";
 import { useState } from "react";
 import styles from "./day.module.css";
 
@@ -12,9 +12,11 @@ const Day = ({ weekIndex, dayIndex }) => {
 
     const openModal = () => setOpen(1);
 
-    const renderSubjects = () => subjects.map((_, j) => (
-        <Subject key={j} weekIndex={weekIndex} dayIndex={dayIndex} subjectIndex={j} dayDate={date}/>
-    ));
+    const renderSubjects = () => subjects.map((subj, j) => {
+        const setHometask = useSubject(weekIndex, dayIndex, j);
+
+        return <Subject key={j} subject={subj} setHometask={setHometask} dayDate={date}/>
+    });
 
     const strEnd = (() => {
         if (notes.length > 4 && notes.length < 21) return "ок";

@@ -15,7 +15,7 @@ import "./modal.css";
 const Context = createContext();
 
 const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
-    const { setNotes, editNote } = useNotes();
+    const { setNotes, editNote, deleteNote } = useNotes(weekIndex, dayIndex);
     const { queryState, query, resetQueryState } = useQuery();
     const groupNum = useGroupNum();
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
@@ -35,7 +35,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
     const sendRequest = async (method, body, newNoteList) => (
         query(url, method, JSON.stringify(body))
             .then(() => {
-                setNotes(newNoteList, weekIndex, dayIndex);
+                setNotes(newNoteList);
                 closeModal(1);
             })
     );
@@ -55,7 +55,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         }
     }
 
-    const provider = { setOpen, setActiveIndex: setActiveNoteIndex, queryState, sendRequest };
+    const provider = { setOpen, setActiveIndex: setActiveNoteIndex, queryState, sendRequest, deleteNote };
 
     return (
         <Modal open={!!open} onClose={() => closeModal()} className="day" process={queryState}>

@@ -6,16 +6,16 @@ import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
-import { useSubgroup, useSubject, useGroupNum } from "../GlobalContext";
+import { useSubgroup, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 import "./modal.css";
 
-const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
+const Subject = ({ subject, setHometask, dayDate }) => {
     const { 
-        auditories, start, end, numSubgroup, subject, subjShort,
-        type, note, weeks, employees, hometask, setHometask, color
-    } = useSubject(weekIndex, dayIndex, subjectIndex);
+        auditories, start, end, numSubgroup, subjName, subjShort,
+        type, note, weeks, employees, hometask, color
+    } = subject;
     const { subgroup } = useSubgroup();
     const groupNum = useGroupNum();
     const teacher = employees[0];
@@ -39,7 +39,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
     const sendRequest = async (method, body, newHt) => {
         query(url, method, JSON.stringify(body))
             .then(() => {
-                setHometask(weekIndex, dayIndex, subjectIndex, newHt);
+                setHometask(newHt);
                 closeModal();
             });
     }
@@ -97,7 +97,7 @@ const Subject = ({ weekIndex, dayIndex, subjectIndex, dayDate }) => {
                 </div>
             </div>
             <Modal open={open} onClose={closeModal} className="subject" process={queryState}>
-                <p className={`${styles.bolder} ${styles.text}`}>{subject} ({type})</p>
+                <p className={`${styles.bolder} ${styles.text}`}>{subjName} ({type})</p>
                 <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
                 <div className={styles.timetable}>
