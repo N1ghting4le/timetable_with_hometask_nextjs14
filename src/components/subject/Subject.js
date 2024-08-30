@@ -6,16 +6,16 @@ import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
-import { useSubgroup, useGroupNum } from "../GlobalContext";
+import { useSubject, useSubgroup, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 import "./modal.css";
 
-const Subject = ({ subject, setHometask, dayDate }) => {
+const Subject = ({ dayDate, weekIndex, dayIndex, subjIndex }) => {
     const { 
         auditories, start, end, numSubgroup, subjName, subjShort,
-        type, note, weeks, employees, hometask, color
-    } = subject;
+        type, note, weeks, employees, hometask, color, setHometask
+    } = useSubject(weekIndex, dayIndex, subjIndex);
     const { subgroup } = useSubgroup();
     const groupNum = useGroupNum();
     const teacher = employees[0];
