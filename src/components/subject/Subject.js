@@ -6,17 +6,17 @@ import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
-import { useSubject, useSubgroup, useGroupNum } from "../GlobalContext";
+import { useSubject, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
 import styles from "./subject.module.css";
 import "./modal.css";
 
-const Subject = ({ dayDate, weekIndex, dayIndex, subjIndex }) => {
+const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
     const { 
         auditories, start, end, numSubgroup, subjName, subjShort,
-        type, note, weeks, employees, hometask, color, setHometask
-    } = useSubject(weekIndex, dayIndex, subjIndex);
-    const { subgroup } = useSubgroup();
+        type, note, weeks, employees, hometask, color, i
+    } = subject;
+    const setHometask = useSubject(weekIndex, dayIndex, i);
     const groupNum = useGroupNum();
     const teacher = employees[0];
     const { firstName, middleName, lastName, photoLink } = teacher;
@@ -74,7 +74,7 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subjIndex }) => {
         }
     }
 
-    return subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup ? (
+    return (
         <li className={styles.wrapper}>
             <div className={styles.subject} onClick={openModal}>
                 <div className={styles.left}>
@@ -108,14 +108,14 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subjIndex }) => {
                     </div>
                     <div className={styles.timetableColumn}>
                         <span className={styles.timetableItem}>{weeks.length === 4 ? '' : `нед. ${weeks.join()}`}</span>
-                        <span className={styles.timetableItem}>{subgroup ? `подгр. ${subgroup}` : ''}</span>
+                        <span className={styles.timetableItem}>{numSubgroup ? `подгр. ${numSubgroup}` : ''}</span>
                     </div>
                 </div>
                 {subjShort !== 'ФизК' ? <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button> : null}
                 <Form id={inputId} className={styles.input} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
             </Modal>
         </li>
-    ) : null;
+    );
 }
 
 export default Subject;

@@ -36,7 +36,8 @@ export default async function getTimetable(groupNum) {
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
           schedules = response.schedules || response.currentSchedules?.schedules || response.previousSchedules,
-          dateStr = new Date().toJSON().slice(0, 10),
+          date = new Date(),
+          dateStr = (date.getDay() ? date : new Date(date.getTime() - 86400000)).toJSON().slice(0, 10),
           exclusions = ['Консультация', 'Экзамен'];
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
 
@@ -87,7 +88,7 @@ const parseTimetable = (response, listOfWeeks) => {
                         subjEndDate = getTime(subj.endLessonDate);
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
-            }).map(subj => {
+            }).map((subj, i) => {
                 const { subjShort, type: subjType, employees, numSubgroup } = subj;
                 
                 return {
@@ -105,7 +106,8 @@ const parseTimetable = (response, listOfWeeks) => {
                             case 'ПЗ': return 'yellow';
                             case 'ЛР': return 'red';
                         }
-                    })()
+                    })(),
+                    i
                 }
             });
 

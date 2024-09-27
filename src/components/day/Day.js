@@ -2,19 +2,22 @@
 
 import DayModal from "../dayModal/DayModal";
 import Subject from "../subject/Subject";
-import { useDay } from "../GlobalContext";
+import { useDay, useSubgroup } from "../GlobalContext";
 import { useState } from "react";
 import styles from "./day.module.css";
 
 const Day = ({ weekIndex, dayIndex }) => {
     const { date, day, subjects, notes } = useDay(weekIndex, dayIndex);
+    const { subgroup } = useSubgroup();
     const [open, setOpen] = useState(0);
 
     const openModal = () => setOpen(1);
 
-    const renderSubjects = () => subjects.map((_, j) => (
-        <Subject key={j} dayDate={date} weekIndex={weekIndex} dayIndex={dayIndex} subjIndex={j}/>
-    ));
+    const renderSubjects = () => subjects
+        .filter(({ numSubgroup }) => subgroup === 0 || numSubgroup === 0 || numSubgroup === subgroup)
+        .map((subj, i) => (
+            <Subject key={i} dayDate={date} weekIndex={weekIndex} dayIndex={dayIndex} subject={subj}/>
+        ));
 
     const strEnd = (() => {
         if (notes.length > 4 && notes.length < 21) return "ок";
@@ -29,7 +32,7 @@ const Day = ({ weekIndex, dayIndex }) => {
 
     const subjectElems = renderSubjects();
 
-    return (
+    return subjectElems.length ? (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
             <p className={styles.text} onClick={openModal}>{date.split('-').reverse().slice(0, 2).join('.')}, {day}{notes.length ? `, ${notes.length} замет${strEnd}` : ''}</p>
             <ul className={styles.subjectList}>
@@ -43,7 +46,7 @@ const Day = ({ weekIndex, dayIndex }) => {
                 weekIndex={weekIndex}
                 dayIndex={dayIndex}/>
         </div>
-    );
+    ) : null;
 }
 
 export default Day;

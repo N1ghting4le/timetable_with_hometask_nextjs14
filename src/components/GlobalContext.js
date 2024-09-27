@@ -79,13 +79,8 @@ const useWeekList = () => useContext(Context).weekList;
 const useGroupNum = () => useContext(Context).groupNum;
 const useWeek = (weekIndex) => useWeekList()[weekIndex];
 const useDay = (weekIndex, dayIndex) => useWeek(weekIndex).days[dayIndex];
-
-const useSubject = (weekIndex, dayIndex, subjectIndex) => {
-    const subject = useDay(weekIndex, dayIndex).subjects[subjectIndex],
-          setHometask = useContext(Context).createHometaskSetter(weekIndex, dayIndex, subjectIndex);
-        
-    return { ...subject, setHometask };
-}
+const useSubject = (weekIndex, dayIndex, subjectIndex) => 
+    useContext(Context).createHometaskSetter(weekIndex, dayIndex, subjectIndex);
 
 const useNotes = (weekIndex, dayIndex) => {
     const context = useContext(Context),
