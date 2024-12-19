@@ -61,11 +61,13 @@ const parseTimetable = (response, listOfWeeks) => {
                 weeks: subj.weekNumber,
                 note: subj.note,
                 employees: subj.employees.length ? subj.employees.map(emp => ({
+                    id: emp.id,
                     firstName: emp.firstName,
                     middleName: emp.middleName,
                     lastName: emp.lastName,
                     photoLink: emp.photoLink
                 })) : [{
+                    id: "",
                     firstName: "",
                     middleName: "",
                     lastName: "",
@@ -94,11 +96,11 @@ const parseTimetable = (response, listOfWeeks) => {
                 return {
                     ...subj,
                     hometask: day.hometasks.find(task => {
-                        const { subject, type: taskType, teacher, subgroup } = task;
+                        const { subject, type: taskType, teacherId, subgroup } = task;
 
                         return subject === subjShort && taskType === subjType && 
                                subgroup === numSubgroup && 
-                               (subject !== 'ИнЯз' || JSON.stringify(teacher) === JSON.stringify(employees[0]));
+                               (subject !== 'ИнЯз' || teacherId === employees[0].id);
                     }) || null,
                     color: (() => {
                         switch (subjType) {

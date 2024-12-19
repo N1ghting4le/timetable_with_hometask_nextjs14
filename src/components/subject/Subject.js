@@ -18,8 +18,7 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
     } = subject;
     const setHometask = useSubject(weekIndex, dayIndex, i);
     const groupNum = useGroupNum();
-    const teacher = employees[0];
-    const { firstName, middleName, lastName, photoLink } = teacher;
+    const { id: teacherId, firstName, middleName, lastName, photoLink } = employees[0];
     const [open, setOpen] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const { queryState, query, resetQueryState } = useQuery();
@@ -51,9 +50,9 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
         if (htText === text || (!htText && !text)) return closeModal();
 
         if (htText && text) {
-            const body = { id: hometask.id, teacher, text };
+            const body = { id: hometask.id, teacherId, text };
 
-            sendRequest("PATCH", body, { ...hometask, teacher, text });
+            sendRequest("PATCH", body, { ...hometask, teacherId, text });
         } else if (htText) {
             sendRequest("DELETE", { id: hometask.id }, null);
         } else {
@@ -62,10 +61,10 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                 date: dayDate,
                 subject: subjShort,
                 type,
-                teacher,
                 text,
                 groupNum,
-                subgroup: numSubgroup
+                subgroup: numSubgroup,
+                teacherId
             };
 
             const { date, groupNum: a, ...newHt } = body;
