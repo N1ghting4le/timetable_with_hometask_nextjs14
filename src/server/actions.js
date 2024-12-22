@@ -100,7 +100,7 @@ const parseTimetable = (response, listOfWeeks) => {
 
                         return subject === subjShort && taskType === subjType && 
                                subgroup === numSubgroup && 
-                               (subject !== 'ИнЯз' || teacherId === employees[0].id);
+                               (subject !== 'ИнЯз' || teacherId == employees[0].id);
                     }) || null,
                     color: (() => {
                         switch (subjType) {

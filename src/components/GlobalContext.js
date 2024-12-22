@@ -49,8 +49,15 @@ const GlobalContext = ({ groupNum, children }) => {
 
         createHometaskSetter: (weekIndex, dayIndex, subjectIndex) => (newHometask) => {
             const weekList = globalState.weekList;
+            const subjects = weekList[weekIndex].days[dayIndex].subjects;
+            const { subjShort, type, numSubgroup, employees } = subjects[subjectIndex];
 
-            weekList[weekIndex].days[dayIndex].subjects[subjectIndex].hometask = newHometask;
+            subjects.forEach(item => {
+                if (item.subjShort === subjShort && item.type === type && item.numSubgroup === numSubgroup
+                    && (subjShort !== 'ИнЯз' || item.employees[0].id == employees[0].id)) {
+                    item.hometask = newHometask;
+                }
+            });
             setGlobalState(state => ({...state, weekList}));
         },
 
