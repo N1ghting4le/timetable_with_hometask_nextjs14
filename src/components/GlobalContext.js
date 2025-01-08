@@ -38,11 +38,7 @@ const GlobalContext = ({ groupNum, children }) => {
     }, []);
 
     const provider = {
-        weekList: globalState.weekList,
-        subgroup: globalState.subgroup,
-        prev: globalState.prev,
-        curr: globalState.curr,
-        groupNum: globalState.groupNum,
+        ...globalState,
 
         setSubgroup: (subgroup) => setGlobalState(state => ({...state, subgroup})),
         setCurr: (curr) => setGlobalState(state => ({...state, prev: state.curr, curr})),
@@ -53,8 +49,8 @@ const GlobalContext = ({ groupNum, children }) => {
             const { subjShort, type, numSubgroup, employees } = subjects[subjectIndex];
 
             subjects.forEach(item => {
-                if (item.subjShort === subjShort && item.type === type && item.numSubgroup === numSubgroup
-                    && (subjShort !== 'ИнЯз' || item.employees[0].id == employees[0].id)) {
+                if (item.subjShort === subjShort && item.type === type &&
+                    item.numSubgroup === numSubgroup && item.employees[0].id == employees[0].id) {
                     item.hometask = newHometask;
                 }
             });

@@ -23,7 +23,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
     const url = `${SERVER_URL}/notes`;
     const activeNote = notes[activeNoteIndex];
 
-    useEffect(() => resetQueryState(), [open]);
+    useEffect(resetQueryState, [open]);
 
     const closeModal = (num = 0) => {
         if (queryState === 'pending') return;
@@ -32,16 +32,14 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = async (method, body, newNoteList) => (
-        query(url, method, JSON.stringify(body))
-            .then(() => {
-                setNotes(newNoteList);
-                closeModal(1);
-            })
-    );
+    const sendRequest = (method, body, newNoteList) => query(url, method, JSON.stringify(body))
+        .then(() => {
+            setNotes(newNoteList);
+            closeModal(1);
+        });
 
     const sendNote = () => {
-        const text = document.querySelector(`#${inputId}`).value;
+        const text = document.getElementById(inputId).value;
 
         if ((text === activeNote?.text) || !text) return closeModal(1);
 
@@ -55,7 +53,11 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         }
     }
 
-    const provider = { setOpen, setActiveIndex: setActiveNoteIndex, queryState, sendRequest, deleteNote };
+    const provider = {
+        activeIndex: activeNoteIndex,
+        setActiveIndex: setActiveNoteIndex,
+        setOpen, queryState, sendRequest, deleteNote
+    };
 
     return (
         <Modal open={!!open} onClose={() => closeModal()} className="day" process={queryState}>
@@ -66,12 +68,13 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
                 </Context.Provider> : open === 2 ?
                 <>
-                    <Image src="https://img.icons8.com/windows/32/return.png"
-                            alt="return arrow" 
-                            width={25} 
-                            height={25}
-                            className={styles.backArrow}
-                            onClick={() => closeModal(1)}/> 
+                    <Image
+                        src="https://img.icons8.com/windows/32/return.png"
+                        alt="return arrow" 
+                        width={25} 
+                        height={25}
+                        className={styles.backArrow}
+                        onClick={() => closeModal(1)}/>
                     { activeNoteIndex >= 0 ? <h2>Заметка &#8470;{activeNoteIndex + 1}</h2> : <h2>Новая заметка</h2> }
                     <Form 
                         id={inputId}

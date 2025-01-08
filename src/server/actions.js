@@ -12,18 +12,16 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
     return await res.json();
 }
 
-export const getGroups = async () => {
-    return new Promise((resolve, reject) => {
-        Promise.all([request(GROUP_API_URL), request(FACULTY_API_URL)])
-            .then(([groups, faculties]) => resolve(groups.map(group => ({
-                groupNum: group.name,
-                faculty: faculties.find(item => item.id === group.facultyId).abbrev,
-                speciality: group.specialityName,
-                course: group.course
-            }))))
-            .catch(error => reject(error));
-    });
-}
+export const getGroups = async () => new Promise((resolve, reject) => {
+    Promise.all([request(GROUP_API_URL), request(FACULTY_API_URL)])
+        .then(([groups, faculties]) => resolve(groups.map(group => ({
+            groupNum: group.name,
+            faculty: faculties.find(item => item.id === group.facultyId).abbrev,
+            speciality: group.specialityName,
+            course: group.course
+        }))))
+        .catch(error => reject(error));
+});
 
 export default async function getTimetable(groupNum) {
     return new Promise((resolve, reject) => {
@@ -43,51 +41,47 @@ const parseTimetable = (response, listOfWeeks) => {
 
     const getTime = (dateStr) => new Date(dateStr.split('.').reverse().join('-')).getTime();
     
-    const timetable = days.map(item => {
-        const day = schedules[item];
-
-        return day ? {
-            name: item,
-            subjects: day.filter(subj => !exclusions.includes(subj.lessonTypeAbbrev)).map(subj => ({
-                auditories: subj.auditories.length ? subj.auditories : [""],
-                startLessonDate: subj.startLessonDate,
-                endLessonDate: subj.endLessonDate,
-                start: subj.startLessonTime,
-                end: subj.endLessonTime,
-                numSubgroup: subj.numSubgroup,
-                subjShort: subj.subject,
-                subjName: subj.subjectFullName,
-                type: subj.lessonTypeAbbrev,
-                weeks: subj.weekNumber,
-                note: subj.note,
-                employees: subj.employees.length ? subj.employees.map(emp => ({
-                    id: emp.id,
-                    firstName: emp.firstName,
-                    middleName: emp.middleName,
-                    lastName: emp.lastName,
-                    photoLink: emp.photoLink
-                })) : [{
-                    id: "",
-                    firstName: "",
-                    middleName: "",
-                    lastName: "",
-                    photoLink: ""
-                }]
-            }))
-        } : null;
-    });
+    const timetable = days.filter(item => schedules[item]).map(item => ({
+        name: item,
+        subjects: schedules[item].filter(subj => !exclusions.includes(subj.lessonTypeAbbrev)).map(subj => ({
+            auditories: subj.auditories.length ? subj.auditories : [""],
+            startLessonDate: subj.startLessonDate,
+            endLessonDate: subj.endLessonDate,
+            start: subj.startLessonTime,
+            end: subj.endLessonTime,
+            numSubgroup: subj.numSubgroup,
+            subjShort: subj.subject,
+            subjName: subj.subjectFullName,
+            type: subj.lessonTypeAbbrev,
+            weeks: subj.weekNumber,
+            note: subj.note,
+            employees: subj.employees.length ? subj.employees.map(emp => ({
+                id: emp.id,
+                firstName: emp.firstName,
+                middleName: emp.middleName,
+                lastName: emp.lastName,
+                photoLink: emp.photoLink
+            })) : [{
+                id: "",
+                firstName: "",
+                middleName: "",
+                lastName: "",
+                photoLink: ""
+            }]
+        }))
+    }));
 
     const weekList = listOfWeeks.map((item, i) => ({
         days: item.map((day, index) => {
             if (day.date === dateStr) currWeekIndex = i;
 
             const dayDate = new Date(day.date).getTime(),
-                    weekNum = (day.week - 1) % 4 + 1,
-                    fullDayTimetable = timetable.find(unit => unit?.name === day.name)?.subjects;
+                  weekNum = (day.week - 1) % 4 + 1,
+                  fullDayTimetable = timetable.find(unit => unit.name === day.name)?.subjects;
 
             const subjects = fullDayTimetable?.filter(subj => {
                 const subjStartDate = getTime(subj.startLessonDate),
-                        subjEndDate = getTime(subj.endLessonDate);
+                      subjEndDate = getTime(subj.endLessonDate);
 
                 return subj.weeks?.includes(weekNum) && dayDate >= subjStartDate && dayDate <= subjEndDate;
             }).map((subj, i) => {

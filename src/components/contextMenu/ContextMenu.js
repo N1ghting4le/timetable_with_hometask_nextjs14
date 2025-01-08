@@ -6,12 +6,11 @@ const ContextMenu = ({ children }) => {
 
     return (
         <>
-            { isOverlay ? <div className={styles.overlay} onClick={closeMenu}/> : null }
-            { isActive ? 
-                <div className={styles.conetxtMenu} id={id} style={{...coords, width: `${width}px`}} onClick={closeMenu}>
-                    { children }
-                </div> : null
-            }
+            {isOverlay && <div className={styles.overlay} onClick={closeMenu}/>}
+            {isActive &&
+            <div className={styles.conetxtMenu} id={id} style={{...coords, width: `${width}px`}} onClick={closeMenu}>
+                { children }
+            </div>}
         </>
     );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useNote } from '../dayModal/DayModal';
 import QueryStateDisplay from "../queryStateDisplay/QueryStateDisplay";
 import WithContextMenu from '../WithContextMenu';
@@ -9,30 +8,16 @@ import styles from './note.module.css';
 
 const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
     const { id, text } = notes[i];
-    const [isPending, setIsPending] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const { setOpen, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
+    const { setOpen, activeIndex, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
     const isDisabled = queryState === 'pending';
 
-    useEffect(() => {
-        if (queryState !== 'error' && isError) setIsError(false);
-    }, [queryState]);
-
-    const openNote = () => {
-        setOpen(2);
-        setActiveIndex(i);
-    }
-
-    const removeNote = () => {
-        setIsPending(true);
-        sendRequest("DELETE", { id }, deleteNote(notes, i))
-            .catch(() => setIsError(true))
-            .finally(() => setIsPending(false));
-    }
+    const removeNote = () => sendRequest("DELETE", { id }, deleteNote(notes, i))
+        .then(() => setActiveIndex(-1));
 
     const onContextMenu = (e) => {
         if (isDisabled) return;
 
+        setActiveIndex(i);
         triggerContextMenu(e);
     }
 
@@ -40,10 +25,10 @@ const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
         <>
             <div className={styles.note} onContextMenu={onContextMenu}>{text}</div>
             <ContextMenu>
-                <button onClick={openNote} disabled={isDisabled}>Редактировать</button>
+                <button onClick={() => setOpen(2)} disabled={isDisabled}>Редактировать</button>
                 <button onClick={removeNote} disabled={isDisabled}>Удалить</button>
             </ContextMenu>
-            { isPending || isError ? <QueryStateDisplay queryState={queryState}/> : null }
+            {activeIndex === i && <QueryStateDisplay queryState={queryState}/>}
         </>
     );
 }, { width: 150 });

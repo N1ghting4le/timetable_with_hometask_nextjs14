@@ -35,19 +35,17 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
         resetQueryState();
     }
 
-    const sendRequest = async (method, body, newHt) => {
-        query(url, method, JSON.stringify(body))
-            .then(() => {
-                setHometask(newHt);
-                closeModal();
-            });
-    }
+    const sendRequest = (method, body, newHt) => query(url, method, JSON.stringify(body))
+        .then(() => {
+            setHometask(newHt);
+            closeModal();
+        });
 
     const sendHometask = () => {
-        const text = document.querySelector(`#${inputId}`).value;
+        const text = document.getElementById(inputId).value;
         const htText = hometask?.text;
         
-        if (htText === text || (!htText && !text)) return closeModal();
+        if (htText == text) return closeModal();
 
         if (htText && text) {
             const body = { id: hometask.id, teacherId, text };
@@ -85,9 +83,9 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                     <div className={styles.textWrapper}>
                         <div className={styles.subjAndType}>
                             <p>{subjShort} ({type})</p>
-                            { note ? <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p> : null }
+                            {note && <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p>}
                         </div>
-                        { hometask ? <p className={styles.htText}>{hometask.text}</p> : null}
+                        {hometask && <p className={styles.htText}>{hometask.text}</p>}
                     </div>
                 </div>
                 <div className={styles.subjInfo}>
@@ -110,7 +108,7 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                         <span className={styles.timetableItem}>{numSubgroup ? `подгр. ${numSubgroup}` : ''}</span>
                     </div>
                 </div>
-                {subjShort !== 'ФизК' ? <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button> : null}
+                {subjShort !== 'ФизК' && <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button>}
                 <Form id={inputId} className={styles.input} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
             </Modal>
         </li>
