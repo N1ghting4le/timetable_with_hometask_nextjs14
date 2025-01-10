@@ -1,14 +1,22 @@
 'use client';
 
 import Loading from '../loading/Loading';
-import { useState } from 'react';
-import { useGroups } from '../GroupsContext';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import GroupItemsList from '../groupItemsList/GroupItemsList';
 import styles from './groupsForm.module.css';
 
-const GroupsForm = () => {
+const GroupsForm = ({ groups }) => {
     const [input, setInput] = useState('');
-    const groups = useGroups();
+    const router = useRouter();
+
+    useEffect(() => {
+        const lastViewedGroup = localStorage.getItem('groupNum');
+
+        if (lastViewedGroup) {
+            router.push(`/${lastViewedGroup}`);
+        }
+    }, []);
 
     const handleChange = (e) => setInput(e.target.value);
 

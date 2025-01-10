@@ -1,6 +1,5 @@
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from 'next/font/google';
-import GroupsContext from '@/components/GroupsContext';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
@@ -14,9 +13,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru">
       <body className={inter.className}>
-        <GroupsContext>
-          {children}
-        </GroupsContext>
+        {children}
         <SpeedInsights/>
       </body>
     </html>
