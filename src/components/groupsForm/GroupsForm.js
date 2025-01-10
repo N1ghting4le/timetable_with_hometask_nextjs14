@@ -3,18 +3,21 @@
 import Loading from '../loading/Loading';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useIsInitial } from '../IsInitialContext';
 import GroupItemsList from '../groupItemsList/GroupItemsList';
 import styles from './groupsForm.module.css';
 
 const GroupsForm = ({ groups }) => {
+    const { isInitial, setIsInitial } = useIsInitial();
     const [input, setInput] = useState('');
     const router = useRouter();
 
     useEffect(() => {
         const lastViewedGroup = localStorage.getItem('groupNum');
 
-        if (lastViewedGroup) {
+        if (lastViewedGroup && isInitial) {
             router.push(`/${lastViewedGroup}`);
+            setIsInitial(false);
         }
     }, []);
 
