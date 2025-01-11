@@ -2,19 +2,19 @@
 
 import { LOCAL_STORAGE_GROUP_NUM } from "@/env/env";
 import { createContext, useContext, useState, useEffect } from "react";
-import Error from "@/app/error";
 import getTimetable from '@/server/actions';
 
 const Context = createContext(null);
 
 const GlobalContext = ({ groupNum, children }) => {
-    const [isError, setIsError] = useState(false);
     const [globalState, setGlobalState] = useState({
         subgroup: 0,
         prev: -1,
         curr: -1,
         weekList: [],
-        groupNum
+        groupNum,
+        isLoading: true,
+        isError: false
     });
 
     useEffect(() => {
@@ -28,12 +28,13 @@ const GlobalContext = ({ groupNum, children }) => {
                     ...state,
                     prev: curr,
                     curr,
-                    weekList
+                    weekList,
+                    isLoading: false
                 }));
             })
             .catch(err => {
                 console.error(err);
-                setIsError(true);
+                setGlobalState(state => ({ ...state, isLoading: false, isError: true }));
             });
     }, []);
 
@@ -69,7 +70,7 @@ const GlobalContext = ({ groupNum, children }) => {
             notes.map((note, i) => i === noteIndex ? ({...note, text}) : note),
     };
 
-    return isError ? <Error/> : (
+    return (
         <Context.Provider value={provider}>
             {children}
         </Context.Provider>
@@ -106,6 +107,13 @@ const useSubgroup = () => {
     return { subgroup, setSubgroup };
 }
 
+const useLoadingState = () => {
+    const context = useContext(Context),
+        { isLoading, isError } = context;
+
+    return { isLoading, isError };
+}
+
 export {
     useWeekList,
     useGroupNum,
@@ -114,5 +122,6 @@ export {
     useWeek,
     useDay,
     useNotes,
-    useSubject
+    useSubject,
+    useLoadingState
 };

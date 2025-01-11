@@ -9,3 +9,13 @@
 .weeks {
     display: flex;
 }
+
+.msg {
+    font-size: 48px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    text-align: center;
+}

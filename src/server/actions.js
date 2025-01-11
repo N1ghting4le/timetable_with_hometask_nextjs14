@@ -39,6 +39,8 @@ const parseTimetable = (response, listOfWeeks) => {
           exclusions = ['Консультация', 'Экзамен'];
     let currWeekIndex = 0, firstEmptyWeek = -1, lastEmptyWeek = -1;
 
+    if (!schedules) return { weekList: [], currWeekIndex };
+
     const getTime = (dateStr) => new Date(dateStr.split('.').reverse().join('-')).getTime();
     
     const timetable = days.filter(item => schedules[item]).map(item => ({
