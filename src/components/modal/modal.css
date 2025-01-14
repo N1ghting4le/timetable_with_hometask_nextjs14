@@ -42,6 +42,10 @@
 
 @media (max-width: 576px) {
     .popup-content {
-        max-width: 90vw;
+        width: 90vw;
+    }
+
+    .popup_content_wrapper {
+        width: calc(90vw - 6px);
     }
 }

@@ -19,7 +19,9 @@ const SavedGroupsModal = ({ buttonClass }) => {
     return (
         <>
             <button onClick={() => setOpen(true)} className={buttonClass}>Группы</button>
-            <Modal open={open} onClose={() => setOpen(false)} align="left top" className="groups">
+            <Modal
+                open={open} onClose={() => setOpen(false)} align="left top" className="groups"
+                style={{ maxHeight: "100vh", animation: "slide 0.25s ease-out" }}>
                 <h2>Сохранённые группы:</h2>
                 <GroupItemsList groups={groups} setGroups={setGroups}/>
                 <Link href='/' className={styles.link}>Вернуться к выбору группы</Link>
