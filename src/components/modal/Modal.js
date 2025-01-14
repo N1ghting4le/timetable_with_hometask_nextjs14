@@ -25,12 +25,15 @@ const Modal = ({ open, onClose, style, className, align, process, children }) =>
     })();
 
     return (
-        <Popup modal open={open} onClose={onClose} contentStyle={{margin, ...style}} 
-                className={className} closeOnDocumentClick={process !== 'pending'}>
-            <div className="modal_closer_wrapper">
-                <div className="modal_closer" onClick={onClose}>&times;</div>
+        <Popup 
+            modal open={open} onClose={onClose} contentStyle={{margin, ...style}} 
+            closeOnDocumentClick={process !== 'pending'}>
+            <div className={`popup_content_wrapper ${className}`}>
+                <div className="modal_closer_wrapper">
+                    <div className="modal_closer" onClick={onClose}>&times;</div>
+                </div>
+                {children}
             </div>
-            {children}
         </Popup>
     );
 }

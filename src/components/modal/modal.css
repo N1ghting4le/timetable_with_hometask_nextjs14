@@ -1,12 +1,19 @@
 .popup-content {
+    width: 400px;
+    background-color: #fff;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.popup_content_wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
     padding-block: 20px;
-    width: 400px;
     min-height: 310px;
-    background-color: #fff;
+    width: 394px;
 }
 
 .popup-overlay {

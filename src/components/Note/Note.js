@@ -7,12 +7,20 @@ import ContextMenu from '../contextMenu/ContextMenu';
 import styles from './note.module.css';
 
 const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
-    const { id, text } = notes[i];
+    const { id, text, files } = notes[i];
     const { setOpen, activeIndex, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
     const isDisabled = queryState === 'pending';
 
-    const removeNote = () => sendRequest("DELETE", { id }, deleteNote(notes, i))
-        .then(() => setActiveIndex(-1));
+    const removeNote = () => sendRequest("DELETE", JSON.stringify({ id }), deleteNote(notes, i), {
+        'Content-type': 'application/json'
+    });
+
+    const openNote = async () => {
+        if (isDisabled) return;
+
+        await setActiveIndex(i);
+        setOpen(2);
+    }
 
     const onContextMenu = (e) => {
         if (isDisabled) return;
@@ -23,14 +31,16 @@ const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
 
     return (
         <>
-            <div className={styles.note} onContextMenu={onContextMenu}>{text}</div>
+            <div className={styles.note} onContextMenu={onContextMenu} onClick={openNote}>
+                {text && <p style={{marginBottom: files.length ? 10 : 0}}>{text}</p>}
+                {files.length ? <p className={styles.fileText}>Есть прикреплённые файлы</p> : null}
+            </div>
             <ContextMenu>
-                <button onClick={() => setOpen(2)} disabled={isDisabled}>Редактировать</button>
                 <button onClick={removeNote} disabled={isDisabled}>Удалить</button>
             </ContextMenu>
             {activeIndex === i && <QueryStateDisplay queryState={queryState}/>}
         </>
     );
-}, { width: 150 });
+}, { width: 100 });
 
 export default Note;

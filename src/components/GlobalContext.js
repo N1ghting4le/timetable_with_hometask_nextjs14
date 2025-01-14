@@ -66,8 +66,8 @@ const GlobalContext = ({ groupNum, children }) => {
         },
 
         deleteNote: (notes, noteIndex) => notes.filter((_, i) => i !== noteIndex),
-        editNote: (notes, noteIndex, text) => 
-            notes.map((note, i) => i === noteIndex ? ({...note, text}) : note),
+        editNote: (notes, noteIndex, newNote) => 
+            notes.map((note, i) => i === noteIndex ? newNote : note),
     };
 
     return (

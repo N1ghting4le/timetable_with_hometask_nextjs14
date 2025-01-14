@@ -5,7 +5,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import useQuery from '@/hooks/query.hook';
 import { useGroupNum, useNotes } from '../GlobalContext';
 import { v4 as uuid } from 'uuid';
-import Image from 'next/image';
+import UndoIcon from '@mui/icons-material/Undo';
 import Modal from '../modal/Modal';
 import Form from '../form/Form';
 import NoteList from '../noteList/NoteList';
@@ -19,11 +19,17 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
     const { queryState, query, resetQueryState } = useQuery();
     const groupNum = useGroupNum();
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
+    const [files, setFiles] = useState([]);
+    const [oldFiles, setOldFiles] = useState([]);
     const inputId = "noteInput";
     const url = `${SERVER_URL}/notes`;
     const activeNote = notes[activeNoteIndex];
 
     useEffect(resetQueryState, [open]);
+    useEffect(() => {
+        setOldFiles(activeNote?.files || []);
+        setFiles([]);
+    }, [activeNoteIndex]);
 
     const closeModal = (num = 0) => {
         if (queryState === 'pending') return;
@@ -32,24 +38,60 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = (method, body, newNoteList) => query(url, method, JSON.stringify(body))
-        .then(() => {
-            setNotes(newNoteList);
-            closeModal(1);
-        });
+    const sendRequest = (method, body, newNoteList, headers = {}) =>
+        query(url, method, body, headers)
+            .then(() => {
+                setNotes(newNoteList);
+                closeModal(1);
+            });
 
-    const sendNote = () => {
-        const text = document.getElementById(inputId).value;
+    const sendNote = (e) => {
+        e.preventDefault();
 
-        if ((text === activeNote?.text) || !text) return closeModal(1);
+        const formData = new FormData(e.target);
+        const text = formData.get("text");
+
+        if (activeNote?.text == text && !files.length && oldFiles.every(file => !file.toDelete))
+            return closeModal(1);
 
         if (!activeNote) {
-            const body = { id: uuid(), date, text, groupNum };
-            const { date: a, groupNum: b, ...newNote } = body;
+            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+            const body = {
+                id: uuid(),
+                date,
+                groupNum,
+                filesInfo: JSON.stringify(filesInfo)
+            };
 
-            sendRequest("POST", body, [...notes, newNote]);
+            for (const key in body) {
+                formData.append(key, body[key]);
+            }
+
+            files.forEach(file => formData.append("files", file));
+
+            const { date: a, groupNum: b, filesInfo: c, ...newNote } = body;
+
+            sendRequest("POST", formData, [...notes, { ...newNote, text, files: filesInfo }]);
         } else {
-            sendRequest("PATCH", { id: activeNote.id, text }, editNote(notes, activeNoteIndex, text));
+            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+            const body = {
+                id: activeNote.id,
+                filesInfo: JSON.stringify(filesInfo),
+                deletedFilesIds: JSON.stringify(oldFiles
+                    .filter(file => file.toDelete).map(({ id }) => id))
+            };
+
+            for (const key in body) {
+                formData.append(key, body[key]);
+            }
+
+            files.forEach(file => formData.append("files", file));
+
+            sendRequest("PATCH", formData, editNote(notes, activeNoteIndex, {
+                ...activeNote,
+                text,
+                files: [...oldFiles.filter(file => !file.toDelete), ...filesInfo]
+            }));
         }
     }
 
@@ -68,20 +110,18 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
                 </Context.Provider> : open === 2 ?
                 <>
-                    <Image
-                        src="https://img.icons8.com/windows/32/return.png"
-                        alt="return arrow" 
-                        width={25} 
-                        height={25}
-                        className={styles.backArrow}
-                        onClick={() => closeModal(1)}/>
+                    <UndoIcon className={styles.backArrow} onClick={() => closeModal(1)}/>
                     { activeNoteIndex >= 0 ? <h2>Заметка &#8470;{activeNoteIndex + 1}</h2> : <h2>Новая заметка</h2> }
                     <Form 
                         id={inputId}
                         className={styles.input}
                         onSubmit={sendNote}
                         process={queryState}
-                        text={activeNote?.text}/>
+                        text={activeNote?.text}
+                        oldFiles={oldFiles}
+                        setOldFiles={setOldFiles}
+                        files={files}
+                        setFiles={setFiles}/>
                 </> : null
             }
         </Modal>

@@ -47,6 +47,11 @@
     justify-self: end;
 }
 
+.fileText {
+    margin-top: 10px;
+    color: rgb(120, 207, 212);
+}
+
 .left {
     display: flex;
     gap: 10px;

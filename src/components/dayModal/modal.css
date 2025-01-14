@@ -1,4 +1,4 @@
-.day-content {
-    padding-inline: 20px;
-    max-height: 90vh;
+.day {
+    padding-left: 20px;
+    padding-right: 14px;
 }

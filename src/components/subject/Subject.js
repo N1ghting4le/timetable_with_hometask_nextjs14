@@ -21,10 +21,11 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
     const { id: teacherId, firstName, middleName, lastName, photoLink } = employees[0];
     const [open, setOpen] = useState(false);
     const [showForm, setShowForm] = useState(false);
+    const [files, setFiles] = useState([]);
+    const [oldFiles, setOldFiles] = useState(hometask?.files || []);
     const { queryState, query, resetQueryState } = useQuery();
     const auditory = auditories[0];
     const url = `${SERVER_URL}/hometasks`;
-    const inputId = "hometaskInput";
 
     const openModal = () => setOpen(true);
     
@@ -35,39 +36,72 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
         resetQueryState();
     }
 
-    const sendRequest = (method, body, newHt) => query(url, method, JSON.stringify(body))
+    const sendRequest = (method, body, newHt, headers = {}) => query(url, method, body, headers)
         .then(() => {
             setHometask(newHt);
+            setFiles([]);
+            setOldFiles(newHt?.files || []);
             closeModal();
         });
 
-    const sendHometask = () => {
-        const text = document.getElementById(inputId).value;
+    const sendHometask = (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const text = formData.get("text");
         const htText = hometask?.text;
-        
-        if (htText == text) return closeModal();
 
-        if (htText && text) {
-            const body = { id: hometask.id, teacherId, text };
+        if (htText == text && !files.length && oldFiles.every(file => !file.toDelete))
+            return closeModal();
 
-            sendRequest("PATCH", body, { ...hometask, teacherId, text });
-        } else if (htText) {
-            sendRequest("DELETE", { id: hometask.id }, null);
-        } else {
-            const body = { 
+        if (!htText && !oldFiles.length) {
+            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+            const newHometask = {
                 id: uuid(),
                 date: dayDate,
                 subject: subjShort,
                 type,
-                text,
                 groupNum,
                 subgroup: numSubgroup,
-                teacherId
+                teacherId,
+                filesInfo: JSON.stringify(filesInfo)
             };
 
-            const { date, groupNum: a, ...newHt } = body;
+            for (const key in newHometask) {
+                formData.append(key, newHometask[key]);
+            }
 
-            sendRequest("POST", body, newHt);
+            files.forEach(file => formData.append("files", file));
+
+            const { date, groupNum: a, filesInfo: b, ...newHt } = newHometask;
+
+            sendRequest("POST", formData, { ...newHt, text, files: filesInfo });
+        } else if (!text && !files.length && oldFiles.every(file => file.toDelete)) {
+            sendRequest("DELETE", JSON.stringify({ id: hometask.id }), null, {
+                'Content-type': 'application/json'
+            });
+        } else {
+            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+            const body = {
+                id: hometask.id,
+                teacherId,
+                filesInfo: JSON.stringify(filesInfo),
+                deletedFilesIds: JSON.stringify(oldFiles
+                    .filter(file => file.toDelete).map(({ id }) => id))
+            };
+
+            for (const key in body) {
+                formData.append(key, body[key]);
+            }
+
+            files.forEach(file => formData.append("files", file));
+
+            sendRequest("PATCH", formData, {
+                ...hometask,
+                teacherId,
+                text,
+                files: [...oldFiles.filter(file => !file.toDelete), ...filesInfo]
+            });
         }
     }
 
@@ -80,12 +114,13 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                         <p className={styles.smaller}>{end}</p>
                     </div>
                     <div className={styles.line} style={{backgroundColor: color}}/>
-                    <div className={styles.textWrapper}>
+                    <div>
                         <div className={styles.subjAndType}>
                             <p>{subjShort} ({type})</p>
                             {note && <p>{ note.length > 16 ? `${note.substring(0, 16)}...` : note }</p>}
                         </div>
                         {hometask && <p className={styles.htText}>{hometask.text}</p>}
+                        {oldFiles.length ? <p className={styles.fileText}>Есть прикреплённые файлы</p> : null}
                     </div>
                 </div>
                 <div className={styles.subjInfo}>
@@ -109,7 +144,16 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                     </div>
                 </div>
                 {subjShort !== 'ФизК' && <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button>}
-                <Form id={inputId} className={styles.input} onSubmit={sendHometask} process={queryState} cond={!showForm} text={hometask?.text}/>
+                <Form
+                    className={styles.input}
+                    onSubmit={sendHometask}
+                    process={queryState}
+                    cond={!showForm}
+                    text={hometask?.text}
+                    oldFiles={oldFiles}
+                    setOldFiles={setOldFiles}
+                    files={files}
+                    setFiles={setFiles}/>
             </Modal>
         </li>
     );
