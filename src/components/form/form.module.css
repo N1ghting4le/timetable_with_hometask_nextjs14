@@ -39,7 +39,7 @@
 
 .fileItem {
     display: flex;
-    gap: 30px;
+    justify-content: space-between;
     border-radius: 3px;
     padding: 3px;
 }

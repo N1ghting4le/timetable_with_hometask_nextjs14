@@ -8,6 +8,7 @@ import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
 import { useSubject, useGroupNum } from "../GlobalContext";
 import { v4 as uuid } from "uuid";
+import { fillFormData } from "../dayModal/DayModal";
 import styles from "./subject.module.css";
 import "./modal.css";
 
@@ -54,9 +55,16 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
         if (htText == text && !files.length && oldFiles.every(file => !file.toDelete))
             return closeModal();
 
+        if (!text && !files.length && oldFiles.every(file => file.toDelete)) {
+            return sendRequest("DELETE", JSON.stringify({ id: hometask.id }), null, {
+                'Content-type': 'application/json'
+            });
+        }
+
+        const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+
         if (!htText && !oldFiles.length) {
-            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
-            const newHometask = {
+            const body = {
                 id: uuid(),
                 date: dayDate,
                 subject: subjShort,
@@ -67,34 +75,20 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                 filesInfo: JSON.stringify(filesInfo)
             };
 
-            for (const key in newHometask) {
-                formData.append(key, newHometask[key]);
-            }
+            fillFormData(formData, body, files);
 
-            files.forEach(file => formData.append("files", file));
-
-            const { date, groupNum: a, filesInfo: b, ...newHt } = newHometask;
+            const { date, groupNum: a, filesInfo: b, ...newHt } = body;
 
             sendRequest("POST", formData, { ...newHt, text, files: filesInfo });
-        } else if (!text && !files.length && oldFiles.every(file => file.toDelete)) {
-            sendRequest("DELETE", JSON.stringify({ id: hometask.id }), null, {
-                'Content-type': 'application/json'
-            });
         } else {
-            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
             const body = {
                 id: hometask.id,
                 teacherId,
                 filesInfo: JSON.stringify(filesInfo),
-                deletedFilesIds: JSON.stringify(oldFiles
-                    .filter(file => file.toDelete).map(({ id }) => id))
+                deletedFilesIds: JSON.stringify(oldFiles.filter(file => file.toDelete).map(({ id }) => id))
             };
 
-            for (const key in body) {
-                formData.append(key, body[key]);
-            }
-
-            files.forEach(file => formData.append("files", file));
+            fillFormData(formData, body, files);
 
             sendRequest("PATCH", formData, {
                 ...hometask,

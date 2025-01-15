@@ -12,6 +12,14 @@ import NoteList from '../noteList/NoteList';
 import styles from './dayModal.module.css';
 import "./modal.css";
 
+export const fillFormData = (formData, body, files) => {
+    for (const key in body) {
+        formData.append(key, body[key]);
+    }
+
+    files.forEach(file => formData.append("files", file));
+}
+
 const Context = createContext();
 
 const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
@@ -21,7 +29,6 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const [files, setFiles] = useState([]);
     const [oldFiles, setOldFiles] = useState([]);
-    const inputId = "noteInput";
     const url = `${SERVER_URL}/notes`;
     const activeNote = notes[activeNoteIndex];
 
@@ -38,12 +45,11 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = (method, body, newNoteList, headers = {}) =>
-        query(url, method, body, headers)
-            .then(() => {
-                setNotes(newNoteList);
-                closeModal(1);
-            });
+    const sendRequest = (method, body, newNoteList, headers = {}) => query(url, method, body, headers)
+        .then(() => {
+            setNotes(newNoteList);
+            closeModal(1);
+        });
 
     const sendNote = (e) => {
         e.preventDefault();
@@ -54,8 +60,9 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         if (activeNote?.text == text && !files.length && oldFiles.every(file => !file.toDelete))
             return closeModal(1);
 
+        const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
+
         if (!activeNote) {
-            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
             const body = {
                 id: uuid(),
                 date,
@@ -63,29 +70,19 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                 filesInfo: JSON.stringify(filesInfo)
             };
 
-            for (const key in body) {
-                formData.append(key, body[key]);
-            }
-
-            files.forEach(file => formData.append("files", file));
+            fillFormData(formData, body, files);
 
             const { date: a, groupNum: b, filesInfo: c, ...newNote } = body;
 
             sendRequest("POST", formData, [...notes, { ...newNote, text, files: filesInfo }]);
         } else {
-            const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
             const body = {
                 id: activeNote.id,
                 filesInfo: JSON.stringify(filesInfo),
-                deletedFilesIds: JSON.stringify(oldFiles
-                    .filter(file => file.toDelete).map(({ id }) => id))
+                deletedFilesIds: JSON.stringify(oldFiles.filter(file => file.toDelete).map(({ id }) => id))
             };
 
-            for (const key in body) {
-                formData.append(key, body[key]);
-            }
-
-            files.forEach(file => formData.append("files", file));
+            fillFormData(formData, body, files);
 
             sendRequest("PATCH", formData, editNote(notes, activeNoteIndex, {
                 ...activeNote,
@@ -111,9 +108,8 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
                 </Context.Provider> : open === 2 ?
                 <>
                     <UndoIcon className={styles.backArrow} onClick={() => closeModal(1)}/>
-                    { activeNoteIndex >= 0 ? <h2>Заметка &#8470;{activeNoteIndex + 1}</h2> : <h2>Новая заметка</h2> }
-                    <Form 
-                        id={inputId}
+                    <h2>{activeNoteIndex >= 0 ? `Заметка №${activeNoteIndex + 1}` : "Новая заметка"}</h2>
+                    <Form
                         className={styles.input}
                         onSubmit={sendNote}
                         process={queryState}
