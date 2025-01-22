@@ -2,17 +2,11 @@
 
 import WeekControlPanel from "../weekControlPanel/WeekControlPanel";
 import Week from "../week/Week";
-import Loading from "../loading/Loading";
-import Error from "@/app/error";
-import { useWeekList, useLoadingState } from "../GlobalContext";
+import { useWeekList } from "../GlobalContext";
 import styles from "./weekList.module.css";
 
 const WeekList = () => {
-    const { isLoading, isError } = useLoadingState();
     const weekList = useWeekList();
-    
-    if (isLoading) return <Loading/>;
-    if (isError) return <Error/>;
 
     const renderWeeks = () => weekList.length ?
         weekList.map((_, i) => <Week key={i} weekIndex={i}/>) :

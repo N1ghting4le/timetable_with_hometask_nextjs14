@@ -1,6 +1,5 @@
 'use client';
 
-import Loading from '../loading/Loading';
 import GroupItemsList from '../groupItemsList/GroupItemsList';
 import { useState } from 'react';
 import { useGroups } from '../GroupContext';
@@ -12,7 +11,7 @@ const GroupsForm = () => {
 
     const handleChange = (e) => setInput(e.target.value);
 
-    return groups.length ? (
+    return (
         <div className={styles.wrapper}>
             <p className={styles.title}>Выберите группу:</p>
             <div className={styles.form}>
@@ -23,7 +22,7 @@ const GroupsForm = () => {
             </div>
             <GroupItemsList groups={groups.filter(group => group.groupNum.includes(input))}/>
         </div>
-    ) : <Loading/>;
+    );
 }
 
 export default GroupsForm;

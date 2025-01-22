@@ -3,6 +3,8 @@
 import { LOCAL_STORAGE_GROUP_NUM } from "@/env/env";
 import { createContext, useContext, useState, useEffect } from "react";
 import getTimetable from '@/server/actions';
+import Loading from "./loading/Loading";
+import Error from "@/app/error";
 
 const Context = createContext(null);
 
@@ -12,10 +14,10 @@ const GlobalContext = ({ groupNum, children }) => {
         prev: -1,
         curr: -1,
         weekList: [],
-        groupNum,
-        isLoading: true,
-        isError: false
+        groupNum
     });
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
 
     useEffect(() => {
         getTimetable(groupNum)
@@ -24,18 +26,13 @@ const GlobalContext = ({ groupNum, children }) => {
 
                 localStorage.setItem(LOCAL_STORAGE_GROUP_NUM, groupNum);
 
-                setGlobalState(state => ({
-                    ...state,
-                    prev: curr,
-                    curr,
-                    weekList,
-                    isLoading: false
-                }));
+                setGlobalState(state => ({ ...state, prev: curr, curr, weekList }));
             })
             .catch(err => {
                 console.error(err);
-                setGlobalState(state => ({ ...state, isLoading: false, isError: true }));
-            });
+                setIsError(true);
+            })
+            .finally(() => setIsLoading(false));
     }, []);
 
     const provider = {
@@ -69,6 +66,9 @@ const GlobalContext = ({ groupNum, children }) => {
         editNote: (notes, noteIndex, newNote) => 
             notes.map((note, i) => i === noteIndex ? newNote : note),
     };
+
+    if (isLoading) return <Loading/>;
+    if (isError) return <Error/>;
 
     return (
         <Context.Provider value={provider}>
@@ -107,13 +107,6 @@ const useSubgroup = () => {
     return { subgroup, setSubgroup };
 }
 
-const useLoadingState = () => {
-    const context = useContext(Context),
-        { isLoading, isError } = context;
-
-    return { isLoading, isError };
-}
-
 export {
     useWeekList,
     useGroupNum,
@@ -122,6 +115,5 @@ export {
     useWeek,
     useDay,
     useNotes,
-    useSubject,
-    useLoadingState
+    useSubject
 };

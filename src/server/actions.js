@@ -1,4 +1,4 @@
-import { FACULTY_API_URL, SCHEDULE_API_URL, GROUP_API_URL, SERVER_URL } from "@/env/env";
+import { SCHEDULE_API_URL, GROUP_API_URL, SERVER_URL } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
     const res = await fetch(url, { method, headers, body, cache: 'no-store' });
@@ -11,10 +11,10 @@ export const request = async (url, method = 'GET', body = null, headers = {'Cont
 }
 
 export const getGroups = async () => new Promise((resolve, reject) => {
-    Promise.all([request(GROUP_API_URL), request(FACULTY_API_URL)])
-        .then(([groups, faculties]) => resolve(groups.map(group => ({
+    request(GROUP_API_URL)
+        .then(groups => resolve(groups.map(group => ({
             groupNum: group.name,
-            faculty: faculties.find(item => item.id === group.facultyId).abbrev,
+            faculty: group.facultyAbbrev,
             speciality: group.specialityName,
             course: group.course
         }))))
