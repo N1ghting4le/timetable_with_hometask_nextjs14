@@ -1,5 +1,3 @@
-'use server';
-
 import { FACULTY_API_URL, SCHEDULE_API_URL, GROUP_API_URL, SERVER_URL } from "@/env/env";
 
 export const request = async (url, method = 'GET', body = null, headers = {'Content-Type': 'application/json'}) => {
@@ -23,13 +21,11 @@ export const getGroups = async () => new Promise((resolve, reject) => {
         .catch(error => reject(error));
 });
 
-export default async function getTimetable(groupNum) {
-    return new Promise((resolve, reject) => {
-        Promise.all([request(`${SCHEDULE_API_URL}${groupNum}`), request(`${SERVER_URL}/days/${groupNum}`)])
-            .then(values => resolve(parseTimetable(...values)))
-            .catch(error => reject(error));
-    });
-}
+const getTimetable = async (groupNum) => new Promise((resolve, reject) => {
+    Promise.all([request(`${SCHEDULE_API_URL}${groupNum}`), request(`${SERVER_URL}/days/${groupNum}`)])
+        .then(values => resolve(parseTimetable(...values)))
+        .catch(error => reject(error));
+});
 
 const parseTimetable = (response, listOfWeeks) => {
     const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
@@ -137,3 +133,5 @@ const parseTimetable = (response, listOfWeeks) => {
 
     return { weekList, currWeekIndex };
 }
+
+export default getTimetable;

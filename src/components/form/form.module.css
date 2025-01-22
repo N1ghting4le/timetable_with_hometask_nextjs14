@@ -29,12 +29,11 @@
 
 .filesList {
     margin-top: 10px;
-    padding-left: 10px;
+    padding-inline: 10px;
     display: flex;
     flex-direction: column;
     gap: 5px;
-    width: max-content;
-    max-width: 100%;
+    width: 100%;
 }
 
 .fileItem {

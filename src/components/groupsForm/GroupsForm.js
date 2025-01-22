@@ -1,25 +1,14 @@
 'use client';
 
 import Loading from '../loading/Loading';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useIsInitial } from '../IsInitialContext';
 import GroupItemsList from '../groupItemsList/GroupItemsList';
+import { useState } from 'react';
+import { useGroups } from '../GroupContext';
 import styles from './groupsForm.module.css';
 
-const GroupsForm = ({ groups }) => {
-    const { isInitial, setIsInitial } = useIsInitial();
+const GroupsForm = () => {
     const [input, setInput] = useState('');
-    const router = useRouter();
-
-    useEffect(() => {
-        const lastViewedGroup = localStorage.getItem('groupNum');
-
-        if (lastViewedGroup && isInitial) {
-            router.push(`/${lastViewedGroup}`);
-            setIsInitial(false);
-        }
-    }, []);
+    const groups = useGroups();
 
     const handleChange = (e) => setInput(e.target.value);
 
