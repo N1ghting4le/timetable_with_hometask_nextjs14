@@ -1,22 +1,17 @@
 import styles from "./loading.module.css";
-import Image from "next/image";
 
-const Loading = () => {
-    const chooseTynkovich = () => {
-        const rnd = Math.floor(Math.random() * 10);
-
-        if (rnd < 4) return 1;
-        if (rnd < 7) return 2;
-        return 3;
-    }
-
-    const tynkovich = chooseTynkovich();
-
-    return (
-        <div className={styles.loading}>
-            <Image src={`/sticker${tynkovich}.webp`} priority={true} alt="Tynkovich vertitsya" width={200} height={200} className={styles.image}/>
-        </div>
-    );
-}
+const Loading = () => (
+    <div className={styles.clock}>
+        <div className={styles.top}></div>
+        <div className={styles.right}></div>
+        <div className={styles.bottom}></div>
+        <div className={styles.left}></div>
+        <div className={styles.center}></div>
+        <div className={styles.shadow}></div>
+        <div className={styles.hour}></div>
+        <div className={styles.minute}></div>
+        <div className={styles.second}></div>
+    </div>
+);
 
 export default Loading;

@@ -6,8 +6,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata = {
-  title: 'Разрабы дауны',
-  description: 'Электронный дневник БГУИР',
+  title: 'Расписание БГУИР',
+  description: 'Расписание пар в БГУИР с возможностью добавлять домашние задания и заметки',
 }
 
 export default function RootLayout({ children }) {

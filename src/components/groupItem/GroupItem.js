@@ -7,7 +7,7 @@ import ContextMenu from '../contextMenu/ContextMenu';
 import Link from 'next/link';
 import styles from './groupItem.module.css';
 
-const GroupItem = WithContextMenu(({ group, setGroups, triggerContextMenu }) => {
+const GroupItem = WithContextMenu(({ group, setGroups, active, triggerContextMenu }) => {
     const { groupNum, faculty, speciality, course } = group;
     const pathname = usePathname();
 
@@ -22,7 +22,7 @@ const GroupItem = WithContextMenu(({ group, setGroups, triggerContextMenu }) => 
     }
 
     const handleRightClick = (e) => {
-        if (!setGroups) return;
+        if (!setGroups || active) return;
         
         triggerContextMenu(e);
     }

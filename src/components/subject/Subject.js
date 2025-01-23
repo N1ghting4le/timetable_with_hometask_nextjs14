@@ -20,6 +20,7 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
     const setHometask = useSubject(weekIndex, dayIndex, i);
     const groupNum = useGroupNum();
     const { id: teacherId, firstName, middleName, lastName, photoLink } = employees[0];
+    const [src, setSrc] = useState(photoLink || PHOTO_URL);
     const [open, setOpen] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [files, setFiles] = useState([]);
@@ -124,7 +125,14 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
             </div>
             <Modal open={open} onClose={closeModal} className="subject" process={queryState}>
                 <p className={`${styles.bolder} ${styles.text}`}>{subjName} ({type})</p>
-                <Image width={180} height={180} src={photoLink || PHOTO_URL} alt={`photo of ${lastName}`} className={styles.photo} style={{borderColor: color}}/>
+                <Image 
+                    width={180}
+                    height={180}
+                    src={src}
+                    alt={`photo of ${lastName}`}
+                    onError={() => setSrc(PHOTO_URL)}
+                    className={styles.photo}
+                    style={{borderColor: color}}/>
                 <p className={styles.text}>{lastName} {firstName} {middleName}</p>
                 <div className={styles.timetable}>
                     <div className={styles.timetableColumn}>

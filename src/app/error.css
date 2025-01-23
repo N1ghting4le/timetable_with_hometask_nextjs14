@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Bad+Script&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+#container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #112;
+    background-image: url("https://images.weserv.nl/?url=i.imgur.com/6QJjYMe.jpg");
+    background-repeat: repeat-y;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+#text,
+#shadow {
+    position: absolute;
+    font-size: 7em;
+    letter-spacing: 20px;
+    font-family: "Bad Script";
+    color: #fff;
+}
+
+#text {
+    color: #333
+}
+
+#shadow {
+    text-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #228DFF, 0 0 70px #228DFF, 0 0 80px #228DFF, 0 0 100px #228DFF, 0 0 150px #228DFF;
+}
+
+#glow {
+    animation: neon1 linear infinite 3s 1.5s;
+    will-change: opacity;
+}
+
+#blink {
+    animation: blink linear infinite 2s 0s;
+}
+
+@keyframes neon1 {
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes blink {
+    70% {
+        opacity: 1;
+    }
+
+    79% {
+        opacity: 0;
+    }
+
+    81% {
+        opacity: 1;
+    }
+
+    82% {
+        opacity: 0;
+    }
+
+    83% {
+        opacity: 1;
+    }
+
+    92% {
+        opacity: 0;
+    }
+
+    92.5% {
+        opacity: 1;
+    }
+}

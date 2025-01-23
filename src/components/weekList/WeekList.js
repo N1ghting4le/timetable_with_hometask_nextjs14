@@ -10,7 +10,7 @@ const WeekList = () => {
 
     const renderWeeks = () => weekList.length ?
         weekList.map((_, i) => <Week key={i} weekIndex={i}/>) :
-        <p className={styles.msg}>Дауны на методистах не составили расписание</p>;
+        <p className={styles.msg}>Расписание не составлено</p>;
 
     const elements = renderWeeks();
 

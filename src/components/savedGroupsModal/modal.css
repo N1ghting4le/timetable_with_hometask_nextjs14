@@ -1,3 +1,7 @@
+.groups {
+    padding-inline: 15px;
+}
+
 @keyframes slide {
     from {
         transform: translateX(-100%);

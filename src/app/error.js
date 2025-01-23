@@ -1,21 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import styles from "./error.module.css";
- 
-export default function Error({ error }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
- 
+import "./error.css";
+
+export default function Error() {
   return (
-    <div className={styles.error}>
-      <Image src="/Arthas.jpg" alt='Papich rage' width={912} height={513}/>
-      <h1>Папич сошёл с ума и положил интернет!</h1>
-      <h2>Чтобы попробовать восстановить равновесие силы перезагрузите страницу</h2>
-      <Link href='/'>Вернуться на главную</Link>
+    <div id="container">
+      <p id="text">404 ОШИБКА</p>
+      <p id="shadow">
+        <span id="glow">40</span>
+        <span id="blink">4 ОШ</span>
+        <span id="glow">ИБ</span>
+        <span id="blink">КА</span>
+      </p>
     </div>
   );
 }
