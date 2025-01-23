@@ -1,15 +1,20 @@
 'use client';
 
 import GroupItemsList from '../groupItemsList/GroupItemsList';
+import Loading from '../loading/Loading';
+import Error from '@/app/error';
 import { useState } from 'react';
 import { useGroups } from '../GroupContext';
 import styles from './groupsForm.module.css';
 
 const GroupsForm = () => {
     const [input, setInput] = useState('');
-    const groups = useGroups();
+    const { groups, isLoading, isError } = useGroups();
 
     const handleChange = (e) => setInput(e.target.value);
+
+    if (isLoading) return <Loading/>;
+    if (isError) return <Error/>;
 
     return (
         <div className={styles.wrapper}>
