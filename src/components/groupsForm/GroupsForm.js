@@ -17,16 +17,18 @@ const GroupsForm = () => {
     if (isError) return <Error/>;
 
     return (
-        <div className={styles.wrapper}>
-            <p className={styles.title}>Выберите группу:</p>
-            <div className={styles.form}>
-                <div className={styles.inputWrapper}>
-                    <input type='text' placeholder=" " className={styles.input} onChange={handleChange}/>
-                    <label htmlFor="" className={styles.label}>Начните вводить номер группы</label>
+        <main className={styles.main}>
+            <div className={styles.wrapper}>
+                <p className={styles.title}>Выберите группу:</p>
+                <div className={styles.form}>
+                    <div className={styles.inputWrapper}>
+                        <input type='text' placeholder=" " className={styles.input} onChange={handleChange}/>
+                        <label htmlFor="" className={styles.label}>Начните вводить номер группы</label>
+                    </div>
                 </div>
+                <GroupItemsList groups={groups.filter(group => group.groupNum.includes(input))}/>
             </div>
-            <GroupItemsList groups={groups.filter(group => group.groupNum.includes(input))}/>
-        </div>
+        </main>
     );
 }
 

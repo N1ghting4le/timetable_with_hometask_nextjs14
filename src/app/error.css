@@ -21,6 +21,7 @@
     letter-spacing: 20px;
     font-family: "Bad Script";
     color: #fff;
+    text-align: center;
 }
 
 #text {
@@ -77,5 +78,12 @@
 
     92.5% {
         opacity: 1;
+    }
+}
+
+@media (max-width: 576px) {
+    #text,
+    #shadow {
+        font-size: 3em;
     }
 }

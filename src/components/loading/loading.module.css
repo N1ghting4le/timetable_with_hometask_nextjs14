@@ -1,127 +1,131 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .clock {
+  position: relative;
   height: 200px;
   width: 200px;
   background: white;
   box-sizing: border-box;
   border-radius: 100%;
   border: 10px solid #67D2C8;
+}
+
+.top {
   position: absolute;
+  width: 3px;
+  height: 8px;
+  background: #262626;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+.right {
+  position: absolute;
+  width: 8px;
+  height: 3px;
+  background: #262626;
   top: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto 0;
+}
+.bottom {
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: #262626;
   left: 0;
   right: 0;
   bottom: 0;
+  margin: 0 auto;
+}
+.left {
+  position: absolute;
+  width: 8px;
+  height: 3px;
+  background: #262626;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto 0;
+}
+.center {
+  height: 6px;
+  width: 6px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   margin: auto;
-  .top {
-    position: absolute;
-    width: 3px;
-    height: 8px;
-    background: #262626;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-  }
-  .right {
-    position: absolute;
-    width: 8px;
-    height: 3px;
-    background: #262626;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto 0;
-  }
-  .bottom {
-    position: absolute;
-    width: 3px;
-    height: 8px;
-    background: #262626;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: 0 auto;
-  }
-  .left {
-    position: absolute;
-    width: 8px;
-    height: 3px;
-    background: #262626;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto 0;
-  }
-  .center {
-    height: 6px;
-    width: 6px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    background: #262626;
-    border-radius: 100%;
-  }
-  .shadow {
-    height: 200px;
-    width: 200px;
-    position: absolute;
-    left: 60px;
-    top: 60px;
-    transform: rotate(135deg);
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
-  }
-  .hour {
-    width: 3px;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    animation: time 60s infinite linear;
-    &:before {
-      position: absolute;
-      content: "";
-      background: #262626;
-      height: 60px;
-      width: 3px;
-      top: 30px;
-    }
-  }
-  .minute {
-    width: 1px;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    animation: time 10s infinite linear;
-    &:before {
-      position: absolute;
-      content: "";
-      background: #262626;
-      height: 40px;
-      width: 1px;
-      top: 50px;
-    }
-  }
-  .second {
-    width: 2px;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    animation: time 1s infinite linear;
-    &:before {
-      position: absolute;
-      content: "";
-      background: #fd1111;
-      height: 45px;
-      width: 2px;
-      top: 45px;
-    }
-  }
+  background: #262626;
+  border-radius: 100%;
+}
+.shadow {
+  height: 200px;
+  width: 200px;
+  position: absolute;
+  left: 60px;
+  top: 60px;
+  transform: rotate(135deg);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+}
+.hour {
+  width: 3px;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  animation: time 60s infinite linear;
+}
+.hour::before {
+  position: absolute;
+  content: "";
+  background: #262626;
+  height: 60px;
+  width: 3px;
+  top: 30px;
+}
+.minute {
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  animation: time 10s infinite linear;
+}
+.minute::before {
+  position: absolute;
+  content: "";
+  background: #262626;
+  height: 40px;
+  width: 1px;
+  top: 50px;
+}
+.second {
+  width: 2px;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  animation: time 1s infinite linear;
+}
+.second::before {
+  position: absolute;
+  content: "";
+  background: #fd1111;
+  height: 45px;
+  width: 2px;
+  top: 45px;
 }
 
 @keyframes time {

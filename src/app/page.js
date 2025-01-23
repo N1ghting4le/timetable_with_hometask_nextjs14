@@ -1,10 +1,5 @@
-import styles from './page.module.css';
 import GroupsForm from '@/components/groupsForm/GroupsForm';
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <GroupsForm/>
-    </main>
-  );
+  return <GroupsForm/>;
 }
