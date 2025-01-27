@@ -11,7 +11,7 @@ const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
     const { setOpen, activeIndex, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
     const isDisabled = queryState === 'pending';
 
-    const removeNote = () => sendRequest("DELETE", JSON.stringify({ id }), deleteNote(notes, i), {
+    const removeNote = () => sendRequest("DELETE", JSON.stringify({ id }), () => deleteNote(id), {
         'Content-type': 'application/json'
     });
 

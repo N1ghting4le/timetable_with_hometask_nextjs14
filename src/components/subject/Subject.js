@@ -6,7 +6,8 @@ import { useState } from "react";
 import useQuery from "@/hooks/query.hook";
 import { PHOTO_URL, SERVER_URL } from "@/env/env";
 import Form from "../form/Form";
-import { useSubject, useGroupNum } from "../GlobalContext";
+import { useDispatch, useSelector } from "react-redux";
+import { createHometaskSetter } from "@/store/setters";
 import { v4 as uuid } from "uuid";
 import { fillFormData } from "../dayModal/DayModal";
 import styles from "./subject.module.css";
@@ -17,8 +18,9 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
         auditories, start, end, numSubgroup, subjName, subjShort,
         type, note, weeks, employees, hometask, color, i
     } = subject;
-    const setHometask = useSubject(weekIndex, dayIndex, i);
-    const groupNum = useGroupNum();
+    const dispatch = useDispatch();
+    const { groupNum } = useSelector(state => state.weekList);
+    const setHometask = dispatch(createHometaskSetter(weekIndex, dayIndex, i));
     const { id: teacherId, firstName, middleName, lastName, photoLink } = employees[0];
     const [src, setSrc] = useState(photoLink || PHOTO_URL);
     const [open, setOpen] = useState(false);
@@ -119,7 +121,9 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                     </div>
                 </div>
                 <div className={styles.subjInfo}>
-                    <p className={styles.smaller}>{lastName}{firstName ? ` ${firstName[0]}.` : ''}{middleName ? ` ${middleName[0]}.` : ''}</p>
+                    <p className={styles.smaller}>
+                        {lastName}{firstName ? ` ${firstName[0]}.` : ''}{middleName ? ` ${middleName[0]}.` : ''}
+                    </p>
                     <p className={styles.smaller}>{auditory}</p>
                 </div>
             </div>
@@ -141,11 +145,16 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
                         <span className={styles.timetableItem}>{note}</span>
                     </div>
                     <div className={styles.timetableColumn}>
-                        <span className={styles.timetableItem}>{weeks.length === 4 ? '' : `нед. ${weeks.join()}`}</span>
-                        <span className={styles.timetableItem}>{numSubgroup ? `подгр. ${numSubgroup}` : ''}</span>
+                        <span className={styles.timetableItem}>
+                            {weeks.length === 4 ? '' : `нед. ${weeks.join()}`}
+                        </span>
+                        <span className={styles.timetableItem}>
+                            {numSubgroup ? `подгр. ${numSubgroup}` : ''}
+                        </span>
                     </div>
                 </div>
-                {subjShort !== 'ФизК' && <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button>}
+                {subjShort !== 'ФизК' &&
+                    <button className={styles.button} onClick={() => setShowForm(!showForm)}>Д/З</button>}
                 <Form
                     className={styles.input}
                     onSubmit={sendHometask}

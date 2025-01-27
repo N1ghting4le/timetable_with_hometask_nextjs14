@@ -1,10 +1,10 @@
 'use client';
 
-import GroupItemsList from '../groupItemsList/GroupItemsList';
+import GroupItem from "../groupItem/GroupItem";
 import Loading from '../loading/Loading';
 import Error from '@/app/error';
 import { useState } from 'react';
-import { useGroups } from '../GroupContext';
+import { useGroups } from "../GroupContext";
 import styles from './groupsForm.module.css';
 
 const GroupsForm = () => {
@@ -26,7 +26,11 @@ const GroupsForm = () => {
                         <label htmlFor="" className={styles.label}>Начните вводить номер группы</label>
                     </div>
                 </div>
-                <GroupItemsList groups={groups.filter(group => group.groupNum.includes(input))}/>
+                <div className={styles.groups}>
+                    {groups
+                        .filter(group => group.groupNum.includes(input))
+                        .map(group => <GroupItem key={group.groupNum} group={group}/>)}
+                </div>
             </div>
         </main>
     );

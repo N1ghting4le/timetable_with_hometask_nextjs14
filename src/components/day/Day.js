@@ -2,13 +2,13 @@
 
 import DayModal from "../dayModal/DayModal";
 import Subject from "../subject/Subject";
-import { useDay, useSubgroup } from "../GlobalContext";
+import { useSelector } from "react-redux";
 import { useState } from "react";
 import styles from "./day.module.css";
 
-const Day = ({ weekIndex, dayIndex }) => {
-    const { date, day, subjects, notes } = useDay(weekIndex, dayIndex);
-    const { subgroup } = useSubgroup();
+const Day = ({ weekIndex, dayIndex, dayObj }) => {
+    const { date, day, subjects, notes } = dayObj;
+    const { subgroup, groupNum } = useSelector(state => state.weekList);
     const [open, setOpen] = useState(0);
 
     const openModal = () => setOpen(1);
@@ -31,10 +31,13 @@ const Day = ({ weekIndex, dayIndex }) => {
     })();
 
     const subjectElems = renderSubjects();
+    const dateStr = date.split('-').reverse().slice(0, 2).join('.');
 
     return subjectElems.length ? (
         <div className={`${styles.day} ${dayIndex < 3 ? styles.first : styles.second}`}>
-            <p className={styles.text} onClick={openModal}>{date.split('-').reverse().slice(0, 2).join('.')}, {day}{notes.length ? `, ${notes.length} замет${strEnd}` : ''}</p>
+            <p className={styles.text} onClick={openModal}>
+                {dateStr}, {day}{notes.length ? `, ${notes.length} замет${strEnd}` : ''}
+            </p>
             <ul className={styles.subjectList}>
                 {subjectElems}
             </ul>
@@ -44,7 +47,8 @@ const Day = ({ weekIndex, dayIndex }) => {
                 notes={notes}
                 date={date}
                 weekIndex={weekIndex}
-                dayIndex={dayIndex}/>
+                dayIndex={dayIndex}
+                groupNum={groupNum}/>
         </div>
     ) : null;
 }

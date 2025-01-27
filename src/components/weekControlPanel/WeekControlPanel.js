@@ -1,20 +1,21 @@
 'use client';
 
-import { useCurr, useSubgroup } from '../GlobalContext';
+import { useDispatch, useSelector } from "react-redux";
+import { setCurr, setSubgroup } from "@/store/slices/weekListSlice";
 import Link from 'next/link';
 import HomeIcon from '../HomeIcon';
 import SavedGroupsModal from '../savedGroupsModal/SavedGroupsModal';
 import styles from './weekControlPanel.module.css';
 
 const WeekControlPanel = ({ limit }) => {
-    const { curr, setCurr } = useCurr();
-    const { subgroup, setSubgroup } = useSubgroup();
+    const dispatch = useDispatch();
+    const { curr, subgroup } = useSelector(state => state.weekList);
     const btnNames = ["Общ.", "1 Подгр.", "2 Подгр."];
     const hidden = { opacity: 0, cursor: "default" };
 
-    const moveToNext = () => setCurr(curr + 1);
-    const moveToPrev = () => setCurr(curr - 1);
-    const changeSubgroup = (e) => setSubgroup(+e.target.dataset.subgr);
+    const moveToNext = () => dispatch(setCurr(curr + 1));
+    const moveToPrev = () => dispatch(setCurr(curr - 1));
+    const changeSubgroup = (e) => dispatch(setSubgroup(+e.target.dataset.subgr));
     const isActive = num => subgroup === num ? styles.active : '';
 
     const btns = btnNames.map((item, i) => (

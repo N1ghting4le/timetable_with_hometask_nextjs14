@@ -43,7 +43,9 @@ const GroupItem = WithContextMenu(({ group, setGroups, active, triggerContextMen
 
     return (
         <>
-            <Link href={`/${groupNum}`} className={styles.groupItem} onClick={handleClick} onContextMenu={handleRightClick}>
+            <Link
+                href={`/${groupNum}`} className={styles.groupItem}
+                onClick={handleClick} onContextMenu={handleRightClick}>
                 <p className={styles.groupNum}>{groupNum}</p>
                 <div className={styles.details}>
                     <p>{course} курс,</p>

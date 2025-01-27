@@ -3,12 +3,13 @@
 import { SERVER_URL } from '@/env/env';
 import { useState, useEffect, useContext, createContext } from 'react';
 import useQuery from '@/hooks/query.hook';
-import { useGroupNum, useNotes } from '../GlobalContext';
+import { useDispatch } from 'react-redux';
+import { createNotesSetters } from '@/store/setters';
 import { v4 as uuid } from 'uuid';
 import UndoIcon from '@mui/icons-material/Undo';
 import Modal from '../modal/Modal';
 import Form from '../form/Form';
-import NoteList from '../noteList/NoteList';
+import Note from '../Note/Note';
 import styles from './dayModal.module.css';
 import "./modal.css";
 
@@ -22,10 +23,10 @@ export const fillFormData = (formData, body, files) => {
 
 const Context = createContext();
 
-const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
-    const { setNotes, editNote, deleteNote } = useNotes(weekIndex, dayIndex);
+const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum }) => {
+    const dispatch = useDispatch();
+    const { addNote, editNote, deleteNote } = dispatch(createNotesSetters(weekIndex, dayIndex));
     const { queryState, query, resetQueryState } = useQuery();
-    const groupNum = useGroupNum();
     const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
     const [files, setFiles] = useState([]);
     const [oldFiles, setOldFiles] = useState([]);
@@ -45,10 +46,11 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = (method, body, newNoteList, headers = {}) => query(url, method, body, headers)
+    const sendRequest = (method, body, callback, headers = {}) => query(url, method, body, headers)
         .then(() => {
-            setNotes(newNoteList);
+            callback();
             closeModal(1);
+            setFiles([]);
         });
 
     const sendNote = (e) => {
@@ -74,7 +76,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
 
             const { date: a, groupNum: b, filesInfo: c, ...newNote } = body;
 
-            sendRequest("POST", formData, [...notes, { ...newNote, text, files: filesInfo }]);
+            sendRequest("POST", formData, () => addNote({ ...newNote, text, files: filesInfo }));
         } else {
             const body = {
                 id: activeNote.id,
@@ -84,7 +86,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
 
             fillFormData(formData, body, files);
 
-            sendRequest("PATCH", formData, editNote(notes, activeNoteIndex, {
+            sendRequest("PATCH", formData, () => editNote({
                 ...activeNote,
                 text,
                 files: [...oldFiles.filter(file => !file.toDelete), ...filesInfo]
@@ -103,7 +105,10 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex }) => {
             {
                 open === 1 ?
                 <Context.Provider value={provider}>
-                    <NoteList notes={notes}/>
+                    {notes.length ?
+                    <div className={styles.notes}>
+                        {notes.map((note, i) => <Note key={note.id} i={i} notes={notes}/>)}
+                    </div> : <h2>Нет заметок</h2>}
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
                 </Context.Provider> : open === 2 ?
                 <>

@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
-import { useCurr, useWeek } from "../GlobalContext";
 import Day from "../day/Day";
 import styles from "./week.module.css";
 
-const Week = ({ weekIndex }) => {
-    const { prev, curr } = useCurr();
-    const { days } = useWeek(weekIndex);
+const Week = ({ weekIndex, prev, curr, days }) => {
     const [display, setDisplay] = useState(curr === weekIndex);
     const ref = useRef({});
 
@@ -29,11 +26,13 @@ const Week = ({ weekIndex }) => {
         return styles[prev < weekIndex ? 'fromRight' : 'fromLeft'];
     })();
 
-    const renderDays = () => days.map((item, i) => (
-        <Day key={item.date}
-             weekIndex={weekIndex}
-             dayIndex={i}/>
-    ));
+    const renderDays = () => days.map((day, i) => (
+        <Day
+            key={day.date}
+            weekIndex={weekIndex}
+            dayIndex={i}
+            dayObj={day}
+        />));
 
     const elements = renderDays();
 

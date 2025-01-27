@@ -81,6 +81,17 @@
     font-weight: 500;
 }
 
+.groups {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding-bottom: 15px;
+    padding-inline: 15px;
+    overflow-y: auto;
+}
+
 @media (max-width: 576px) {
     .wrapper {
         width: 100vw;
