@@ -53,12 +53,15 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
 
         const formData = new FormData(e.target);
         const text = formData.get("text");
-        const htText = hometask?.text;
 
-        if (htText == text && !files.length && oldFiles.every(file => !file.toDelete))
+        if (
+            ((!hometask && !text) || hometask?.text == text) &&
+            !files.length && oldFiles.every(file => !file.toDelete)
+        ) {
             return closeModal();
+        }
 
-        if (!text && !files.length && oldFiles.every(file => file.toDelete)) {
+        if (hometask && !text && !files.length && oldFiles.every(file => file.toDelete)) {
             return sendRequest("DELETE", JSON.stringify({ id: hometask.id }), null, {
                 'Content-type': 'application/json'
             });
@@ -66,7 +69,7 @@ const Subject = ({ dayDate, weekIndex, dayIndex, subject }) => {
 
         const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
 
-        if (!htText && !oldFiles.length) {
+        if (!hometask && !oldFiles.length) {
             const body = {
                 id: uuid(),
                 date: dayDate,

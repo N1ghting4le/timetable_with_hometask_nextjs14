@@ -43,7 +43,8 @@ export const {
     setWeekList,
     setSubgroup,
     setCurr,
-    createNotesSetters
+    setHometask,
+    setNotesList
 } = actions;
 
 export default reducer;

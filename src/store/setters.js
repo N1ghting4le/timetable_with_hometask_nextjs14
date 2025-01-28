@@ -1,3 +1,5 @@
+import { setHometask, setNotesList } from "./slices/weekListSlice";
+
 const createHometaskSetter = (weekIndex, dayIndex, subjectIndex) => (dispatch, getState) => {
     const subjects = getState().weekList.weekList[weekIndex].days[dayIndex].subjects;
     const { subjShort, type, numSubgroup, employees } = subjects[subjectIndex];
@@ -14,32 +16,26 @@ const createHometaskSetter = (weekIndex, dayIndex, subjectIndex) => (dispatch, g
             return item;
         });
 
-        dispatch({
-            type: "weekList/setHometask",
-            payload: { weekIndex, dayIndex, updatedSubjects }
-        });
+        dispatch(setHometask({ weekIndex, dayIndex, updatedSubjects }));
     }
 }
 
 const createNotesSetters = (weekIndex, dayIndex) => (dispatch, getState) => {
     const notes = getState().weekList.weekList[weekIndex].days[dayIndex].notes;
-    const action = {
-        type: "weekList/setNotesList",
-        payload: { weekIndex, dayIndex }
-    };
+    const payload = { weekIndex, dayIndex };
 
     return {
         addNote(newNote) {
-            action.payload.notesList = [...notes, newNote];
-            dispatch(action);
+            payload.notesList = [...notes, newNote];
+            dispatch(setNotesList(payload));
         },
         editNote(editedNote) {
-            action.payload.notesList = notes.map(note => note.id === editedNote.id ? editedNote : note);
-            dispatch(action);
+            payload.notesList = notes.map(note => note.id === editedNote.id ? editedNote : note);
+            dispatch(setNotesList(payload));
         },
         deleteNote(delId) {
-            action.payload.notesList = notes.filter(({ id }) => id !== delId);
-            dispatch(action);
+            payload.notesList = notes.filter(({ id }) => id !== delId);
+            dispatch(setNotesList(payload));
         }
     };
 }

@@ -59,8 +59,19 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
         const formData = new FormData(e.target);
         const text = formData.get("text");
 
-        if (activeNote?.text == text && !files.length && oldFiles.every(file => !file.toDelete))
+        if (
+            ((!activeNote && !text) || activeNote?.text == text) &&
+            !files.length && oldFiles.every(file => !file.toDelete)
+        ) {
             return closeModal(1);
+        }
+
+        if (activeNote && !text && !files.length && oldFiles.every(file => file.toDelete)) {
+            const id = activeNote.id;
+            return sendRequest("DELETE", JSON.stringify({ id }), () => deleteNote(id), {
+                'Content-type': 'application/json'
+            });
+        }
 
         const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
 
