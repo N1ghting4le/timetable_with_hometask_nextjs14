@@ -6,17 +6,28 @@ import styles from "./week.module.css";
 
 const Week = ({ weekIndex, prev, curr, days }) => {
     const [display, setDisplay] = useState(curr === weekIndex);
-    const ref = useRef({});
+    const ref = useRef(null);
+    const timeoutRef = useRef(null);
+
+    const clear = (display = false) => {
+        const id = timeoutRef.current;
+
+        if (id) {
+            clearTimeout(id);
+            timeoutRef.current = null;
+        }
+
+        setDisplay(display);
+    }
 
     useEffect(() => {
         if (curr === weekIndex) {
-            setDisplay(true);
+            clear(true);
         } else if (prev === weekIndex) {
-            setTimeout(() => setDisplay(false), 300);
-            
+            timeoutRef.current = setTimeout(() => setDisplay(false), 300);
             ref.current.classList.add(styles[curr > weekIndex ? 'toLeft' : 'toRight']);
         } else if (display) {
-            setDisplay(false);
+            clear();
         }
     }, [curr]);
 
