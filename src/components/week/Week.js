@@ -24,7 +24,7 @@ const Week = ({ weekIndex, prev, curr, days }) => {
         if (curr === weekIndex) {
             clear(true);
         } else if (prev === weekIndex) {
-            timeoutRef.current = setTimeout(() => setDisplay(false), 300);
+            timeoutRef.current = setTimeout(clear, 300);
             ref.current.classList.add(styles[curr > weekIndex ? 'toLeft' : 'toRight']);
         } else if (display) {
             clear();

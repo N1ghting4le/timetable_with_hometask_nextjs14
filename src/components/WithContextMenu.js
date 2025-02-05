@@ -24,8 +24,10 @@ const WithContextMenu = (WrappedComponent, { width }) => {
         }
 
         const closeMenu = () => {
-            setTimeout(() => setIsActive(false), 200);
-            setIsOverlay(false);
+            setTimeout(() => {
+                setIsActive(false);
+                setIsOverlay(false);
+            }, 200);
             document.getElementById(id).style.opacity = 0;
         }
 

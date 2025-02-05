@@ -15,12 +15,12 @@ const WeekControlPanel = ({ limit }) => {
 
     const moveToNext = () => dispatch(setCurr(curr + 1));
     const moveToPrev = () => dispatch(setCurr(curr - 1));
-    const changeSubgroup = (e) => dispatch(setSubgroup(+e.target.dataset.subgr));
+    const changeSubgroup = (i) => dispatch(setSubgroup(i));
     const isActive = num => subgroup === num ? styles.active : '';
 
     const btns = btnNames.map((item, i) => (
         <button key={i} className={`${styles.buttonStyle} ${isActive(i)}`} 
-                data-subgr={i} onClick={changeSubgroup}>{item}</button>
+                onClick={() => changeSubgroup(i)}>{item}</button>
     ));
     
     return (

@@ -6,14 +6,14 @@ import WithContextMenu from '../WithContextMenu';
 import ContextMenu from '../contextMenu/ContextMenu';
 import styles from './note.module.css';
 
-const Note = WithContextMenu(({ i, notes, triggerContextMenu }) => {
-    const { id, text, files } = notes[i];
+const Note = WithContextMenu(({ i, note, triggerContextMenu }) => {
+    const { id, text, files } = note;
     const { setOpen, activeIndex, setActiveIndex, queryState, sendRequest, deleteNote } = useNote();
     const isDisabled = queryState === 'pending';
 
-    const removeNote = () => sendRequest("DELETE", JSON.stringify({ id }), () => deleteNote(id), {
-        'Content-type': 'application/json'
-    });
+    const removeNote = () =>
+        sendRequest("DELETE", JSON.stringify({ id }), {'Content-type': 'application/json'})
+            .then(() => deleteNote(id));
 
     const openNote = async () => {
         if (isDisabled) return;

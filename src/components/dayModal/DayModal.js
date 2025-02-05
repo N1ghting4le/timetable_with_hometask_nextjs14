@@ -46,9 +46,8 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
         setActiveNoteIndex(-1);
     }
 
-    const sendRequest = (method, body, callback, headers = {}) => query(url, method, body, headers)
+    const sendRequest = (method, body, headers = {}) => query(url, method, body, headers)
         .then(() => {
-            callback();
             closeModal(1);
             setFiles([]);
         });
@@ -68,9 +67,8 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
 
         if (activeNote && !text && !files.length && oldFiles.every(file => file.toDelete)) {
             const id = activeNote.id;
-            return sendRequest("DELETE", JSON.stringify({ id }), () => deleteNote(id), {
-                'Content-type': 'application/json'
-            });
+            return sendRequest("DELETE", JSON.stringify({ id }), {'Content-type': 'application/json'})
+                .then(() => deleteNote(id));
         }
 
         const filesInfo = files.map(({ name }) => ({ id: uuid(), title: name }));
@@ -87,7 +85,8 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
 
             const { date: a, groupNum: b, filesInfo: c, ...newNote } = body;
 
-            sendRequest("POST", formData, () => addNote({ ...newNote, text, files: filesInfo }));
+            sendRequest("POST", formData)
+                .then(() => addNote({ ...newNote, text, files: filesInfo }));
         } else {
             const body = {
                 id: activeNote.id,
@@ -97,11 +96,12 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
 
             fillFormData(formData, body, files);
 
-            sendRequest("PATCH", formData, () => editNote({
-                ...activeNote,
-                text,
-                files: [...oldFiles.filter(file => !file.toDelete), ...filesInfo]
-            }));
+            sendRequest("PATCH", formData)
+                .then(() => editNote({
+                    ...activeNote,
+                    text,
+                    files: [...oldFiles.filter(file => !file.toDelete), ...filesInfo]
+                }));
         }
     }
 
@@ -118,7 +118,7 @@ const DayModal = ({ open, setOpen, notes, date, weekIndex, dayIndex, groupNum })
                 <Context.Provider value={provider}>
                     {notes.length ?
                     <div className={styles.notes}>
-                        {notes.map((note, i) => <Note key={note.id} i={i} notes={notes}/>)}
+                        {notes.map((note, i) => <Note key={note.id} i={i} note={note}/>)}
                     </div> : <h2>Нет заметок</h2>}
                     <button className={styles.addNoteBtn} onClick={() => setOpen(2)}>+</button>
                 </Context.Provider> : open === 2 ?
